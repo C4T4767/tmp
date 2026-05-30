@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, ArrowLeft, Package } from 'lucide-react';
+import { Search, ArrowLeft, AlertTriangle, Package } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { mockProductOffers, mockProducts } from '@/lib/mock-data';
@@ -21,6 +21,7 @@ function getProductOffers(productId: string) {
 function ProductComparisonRow({ product }: { product: Product }) {
   const offers = getProductOffers(product.id);
   const lowestOfferId = offers[0]?.id;
+  const isBlockedProduct = product.status === 'blocked';
 
   return (
     <article className="border-b border-border py-4 last:border-b-0">
@@ -38,35 +39,45 @@ function ProductComparisonRow({ product }: { product: Product }) {
           </p>
         </div>
 
-        <div className="flex w-32 flex-shrink-0 flex-col gap-2">
-          {offers.slice(0, 3).map((offer) => {
-            const isLowest = offer.id === lowestOfferId;
-            const totalPrice = offer.price + offer.shipping;
+        {isBlockedProduct ? (
+          <div className="flex w-32 flex-shrink-0 items-center gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-2.5 py-2 text-destructive">
+            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs font-bold">금지품목</p>
+              <p className="mt-0.5 text-[11px] leading-4">가격 제공 불가</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex w-32 flex-shrink-0 flex-col gap-2">
+            {offers.slice(0, 3).map((offer) => {
+              const isLowest = offer.id === lowestOfferId;
+              const totalPrice = offer.price + offer.shipping;
 
-            return (
-              <div
-                key={offer.id}
-                className="rounded-md border border-border bg-background px-2 py-1.5"
-              >
-                <div className="flex items-center justify-between gap-1">
-                  <span className="truncate text-[11px] font-medium text-muted-foreground">
-                    {offer.store}
-                  </span>
-                  {isLowest && (
-                    <span className="rounded-sm bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                      최저
+              return (
+                <div
+                  key={offer.id}
+                  className="rounded-md border border-border bg-background px-2 py-1.5"
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="truncate text-[11px] font-medium text-muted-foreground">
+                      {offer.store}
                     </span>
-                  )}
+                    {isLowest && (
+                      <span className="rounded-sm bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                        최저
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 flex items-center justify-end gap-1 text-primary">
+                    <span className="text-sm font-bold">
+                      {totalPrice.toLocaleString()}원
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-1 flex items-center justify-end gap-1 text-primary">
-                  <span className="text-sm font-bold">
-                    {totalPrice.toLocaleString()}원
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </article>
   );
