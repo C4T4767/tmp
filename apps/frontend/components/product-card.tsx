@@ -5,15 +5,32 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SafetyBadge } from '@/components/safety-badge';
 import type { Product } from '@/lib/types';
-import { Package } from 'lucide-react';
+import { ExternalLink, Package, Store } from 'lucide-react';
+
+interface ProductCardPriceInfo {
+  store: string;
+  price: number;
+  shipping: number;
+  url: string;
+}
 
 interface ProductCardProps {
   product: Product;
+  priceInfo?: ProductCardPriceInfo;
   showDeleteButton?: boolean;
   onDelete?: () => void;
+  onVisitStore?: () => void;
 }
 
-export function ProductCard({ product, showDeleteButton, onDelete }: ProductCardProps) {
+export function ProductCard({
+  product,
+  priceInfo,
+  showDeleteButton,
+  onDelete,
+  onVisitStore,
+}: ProductCardProps) {
+  const displayPrice = priceInfo?.price ?? product.price;
+
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-md">
       <CardContent className="p-4">
@@ -24,13 +41,37 @@ export function ProductCard({ product, showDeleteButton, onDelete }: ProductCard
           <div className="flex flex-1 flex-col justify-between">
             <div>
               <h3 className="font-semibold text-foreground line-clamp-2">{product.name}</h3>
-              <p className="mt-1 text-lg font-bold text-primary">
-                {product.price.toLocaleString()}원
-              </p>
+              <div className="mt-1 flex items-center justify-between gap-2">
+                <p className="text-lg font-bold text-primary">
+                  {displayPrice.toLocaleString()}원
+                </p>
+                <SafetyBadge status={product.status} />
+              </div>
+              {priceInfo && (
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1 font-medium text-foreground">
+                    <Store className="h-3 w-3" />
+                    {priceInfo.store}
+                  </span>
+                  <span>배송비 {priceInfo.shipping.toLocaleString()}원</span>
+                </div>
+              )}
             </div>
-            <div className="mt-2 flex items-center justify-between">
-              <SafetyBadge status={product.status} />
-              <div className="flex gap-2">
+            <div className="mt-2 flex justify-end">
+              <div className="flex flex-wrap justify-end gap-2">
+                {priceInfo && (
+                  <Button asChild size="sm" variant="outline">
+                    <a
+                      href={priceInfo.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={onVisitStore}
+                    >
+                      구매하기
+                      <ExternalLink className="ml-1 h-3 w-3" />
+                    </a>
+                  </Button>
+                )}
                 {showDeleteButton && onDelete && (
                   <Button
                     variant="outline"
