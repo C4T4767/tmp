@@ -11,12 +11,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 const healthOptions = [
-  { id: 'pregnant', label: '임산부 여부' },
+  { id: 'pregnant', label: '임신' },
+  { id: 'hypertension', label: '고혈압' },
+  { id: 'hyperlipidemia', label: '고지혈증' },
+  { id: 'diabetes', label: '당뇨' },
   { id: 'breastfeeding', label: '수유 여부' },
   { id: 'child', label: '어린이 여부' },
   { id: 'elderly', label: '고령자 여부' },
-  { id: 'caffeine', label: '카페인 민감 여부' },
-  { id: 'allergies', label: '특정 성분 주의 여부' },
+  { id: 'caffeine', label: '카페인 민감' },
 ];
 
 export function OnboardingScreen() {

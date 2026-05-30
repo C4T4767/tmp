@@ -12,19 +12,56 @@ interface SearchScreenProps {
   initialQuery?: string;
 }
 
+interface ProductSearchResult {
+  product: Product;
+  matchedIngredientName?: string;
+}
+
 function getProductOffers(productId: string) {
   return mockProductOffers
     .filter((offer) => offer.productId === productId)
     .sort((a, b) => a.price + a.shipping - (b.price + b.shipping));
 }
 
-function ProductComparisonRow({ product }: { product: Product }) {
+function getProductSearchResults(keyword: string): ProductSearchResult[] {
+  const normalizedKeyword = keyword.trim().toLowerCase();
+
+  if (!normalizedKeyword) {
+    return mockProducts.map((product) => ({ product }));
+  }
+
+  return mockProducts.reduce<ProductSearchResult[]>((results, product) => {
+    const isProductNameMatched = product.name.toLowerCase().includes(normalizedKeyword);
+    const matchedIngredient = product.ingredients.find((ingredient) =>
+      ingredient.name.toLowerCase().includes(normalizedKeyword)
+    );
+
+    if (!isProductNameMatched && !matchedIngredient) {
+      return results;
+    }
+
+    results.push({
+      product,
+      ...(isProductNameMatched || !matchedIngredient
+        ? {}
+        : { matchedIngredientName: matchedIngredient.name }),
+    });
+
+    return results;
+  }, []);
+}
+
+function ProductComparisonRow({ result }: { result: ProductSearchResult }) {
+  const { product, matchedIngredientName } = result;
   const offers = getProductOffers(product.id);
   const lowestOfferId = offers[0]?.id;
   const isBlockedProduct = product.status === 'blocked';
 
   return (
-    <article className="border-b border-border py-4 last:border-b-0">
+    <Link
+      href={`/product/${product.id}`}
+      className="block border-b border-border py-4 transition-colors last:border-b-0 hover:bg-muted/30"
+    >
       <div className="flex gap-3">
         <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-md border border-border bg-muted">
           <Package className="h-8 w-8 text-muted-foreground" />
@@ -34,6 +71,11 @@ function ProductComparisonRow({ product }: { product: Product }) {
           <h2 className="line-clamp-2 text-sm font-bold leading-5 text-foreground">
             {product.name}
           </h2>
+          {matchedIngredientName && (
+            <p className="mt-1 text-xs font-medium text-primary">
+              성분명 매칭: {matchedIngredientName}
+            </p>
+          )}
         </div>
 
         {isBlockedProduct ? (
@@ -70,32 +112,28 @@ function ProductComparisonRow({ product }: { product: Product }) {
                       {totalPrice.toLocaleString()}원
                     </span>
                   </div>
+                  <p className="mt-0.5 text-right text-[10px] text-muted-foreground">
+                    배송비 포함
+                  </p>
                 </div>
               );
             })}
           </div>
         )}
       </div>
-    </article>
+    </Link>
   );
 }
 
 export function SearchScreen({ initialQuery = '' }: SearchScreenProps) {
   const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [results, setResults] = useState(
-    initialQuery
-      ? mockProducts.filter((p) =>
-          p.name.toLowerCase().includes(initialQuery.toLowerCase())
-        )
-      : mockProducts
+  const [results, setResults] = useState<ProductSearchResult[]>(
+    getProductSearchResults(initialQuery)
   );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const filtered = mockProducts.filter((p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setResults(filtered);
+    setResults(getProductSearchResults(searchQuery));
   };
 
   return (
@@ -131,8 +169,8 @@ export function SearchScreen({ initialQuery = '' }: SearchScreenProps) {
           {results.length}개의 상품을 찾았습니다
         </p>
         <div className="rounded-lg border border-border bg-card px-3">
-          {results.map((product) => (
-            <ProductComparisonRow key={product.id} product={product} />
+          {results.map((result) => (
+            <ProductComparisonRow key={result.product.id} result={result} />
           ))}
         </div>
         {results.length === 0 && (
