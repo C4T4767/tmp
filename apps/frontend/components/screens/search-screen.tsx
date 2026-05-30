@@ -34,9 +34,6 @@ function ProductComparisonRow({ product }: { product: Product }) {
           <h2 className="line-clamp-2 text-sm font-bold leading-5 text-foreground">
             {product.name}
           </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {offers.length}개 판매처 가격 비교
-          </p>
         </div>
 
         {isBlockedProduct ? (
