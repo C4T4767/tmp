@@ -2,6 +2,8 @@ export type SafetyStatus = 'safe' | 'caution' | 'blocked' | 'user-risk' | 'group
 
 export interface Ingredient {
   name: string;
+  amount?: string;
+  unit?: string;
   status: SafetyStatus;
 }
 
@@ -30,6 +32,7 @@ export interface ProductOffer {
   url: string;
   rank: number;
   crawledAt: string;
+  reviewSummary?: ReviewSummary;
 }
 
 export interface ReviewSummary {
@@ -37,6 +40,11 @@ export interface ReviewSummary {
   negative: number;
   other: number;
   summary: string;
+  topics: {
+    name: string;
+    sentiment: 'positive' | 'negative' | 'other';
+    summary: string;
+  }[];
 }
 
 export interface Group {
@@ -64,10 +72,12 @@ export interface User {
 
 export interface OnboardingInfo {
   isPregnant: boolean;
+  hasHypertension: boolean;
+  hasHyperlipidemia: boolean;
+  hasDiabetes: boolean;
   isBreastfeeding: boolean;
   isChild: boolean;
   isElderly: boolean;
   isCaffeineSensitive: boolean;
-  hasSpecificAllergies: boolean;
   additionalNotes: string;
 }

@@ -21,7 +21,7 @@ const statusConfig: Record<SafetyStatus, { label: string; className: string }> =
   },
   'user-risk': {
     label: '내 정보 기준 위험',
-    className: 'bg-destructive text-destructive-foreground',
+    className: 'bg-warning text-warning-foreground',
   },
   'group-caution': {
     label: '그룹원 주의',

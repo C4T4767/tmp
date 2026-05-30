@@ -1,16 +1,16 @@
-import type { Product, PriceInfo, ProductOffer, ReviewSummary, Group, GroupMember } from './types';
+import type { Product, PriceInfo, ProductOffer, Group, GroupMember } from './types';
 
 export const mockProducts: Product[] = [
   {
     id: '1',
     name: 'Nature Made 멀티비타민',
     price: 25900,
-    status: 'safe',
+    status: 'user-risk',
     ingredients: [
-      { name: '비타민 A', status: 'safe' },
-      { name: '비타민 C', status: 'safe' },
-      { name: '비타민 D', status: 'safe' },
-      { name: '아연', status: 'safe' },
+      { name: '비타민 A', amount: '900', unit: 'mcg', status: 'safe' },
+      { name: '비타민 C', amount: '90', unit: 'mg', status: 'user-risk' },
+      { name: '비타민 D', amount: '25', unit: 'mcg', status: 'safe' },
+      { name: '아연', amount: '11', unit: 'mg', status: 'safe' },
     ],
   },
   {
@@ -19,9 +19,9 @@ export const mockProducts: Product[] = [
     price: 32500,
     status: 'caution',
     ingredients: [
-      { name: 'EPA', status: 'safe' },
-      { name: 'DHA', status: 'safe' },
-      { name: '비타민 E', status: 'caution' },
+      { name: 'EPA', amount: '180', unit: 'mg', status: 'safe' },
+      { name: 'DHA', amount: '120', unit: 'mg', status: 'safe' },
+      { name: '비타민 E', amount: '10', unit: 'mg', status: 'caution' },
     ],
   },
   {
@@ -30,9 +30,9 @@ export const mockProducts: Product[] = [
     price: 28000,
     status: 'blocked',
     ingredients: [
-      { name: '락토바실러스', status: 'safe' },
-      { name: '비피도박테리움', status: 'safe' },
-      { name: '에페드린', status: 'blocked' },
+      { name: '락토바실러스', amount: '10', unit: 'billion CFU', status: 'safe' },
+      { name: '비피도박테리움', amount: '5', unit: 'billion CFU', status: 'safe' },
+      { name: '에페드린', amount: '20', unit: 'mg', status: 'blocked' },
     ],
   },
   {
@@ -41,8 +41,8 @@ export const mockProducts: Product[] = [
     price: 18500,
     status: 'user-risk',
     ingredients: [
-      { name: '비타민 C', status: 'safe' },
-      { name: '카페인', status: 'user-risk' },
+      { name: '비타민 C', amount: '1000', unit: 'mg', status: 'safe' },
+      { name: '카페인', amount: '80', unit: 'mg', status: 'user-risk' },
     ],
   },
   {
@@ -51,9 +51,9 @@ export const mockProducts: Product[] = [
     price: 45000,
     status: 'group-caution',
     ingredients: [
-      { name: '완두 단백질', status: 'safe' },
-      { name: '프로바이오틱스', status: 'safe' },
-      { name: '견과류 추출물', status: 'group-caution' },
+      { name: '완두 단백질', amount: '20', unit: 'g', status: 'safe' },
+      { name: '프로바이오틱스', amount: '3', unit: 'billion CFU', status: 'safe' },
+      { name: '견과류 추출물', amount: '200', unit: 'mg', status: 'group-caution' },
     ],
   },
 ];
@@ -74,6 +74,17 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://iherb.com',
     rank: 1,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 76,
+      negative: 14,
+      other: 10,
+      summary: '제품 효과와 가격 만족도가 높고, 배송은 대체로 안정적이라는 의견이 많습니다.',
+      topics: [
+        { name: '효과', sentiment: 'positive', summary: '꾸준히 먹기 좋고 피로감이 줄었다는 의견이 많습니다.' },
+        { name: '배송', sentiment: 'positive', summary: '예상보다 빨리 받았다는 의견이 많습니다.' },
+        { name: '포장', sentiment: 'other', summary: '포장 상태는 무난하다는 반응입니다.' },
+      ],
+    },
   },
   {
     id: '2',
@@ -84,6 +95,17 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://amazon.com',
     rank: 2,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 61,
+      negative: 28,
+      other: 11,
+      summary: '제품 자체 평가는 괜찮지만 해외배송 지연과 포장 훼손 불만이 일부 있습니다.',
+      topics: [
+        { name: '가격', sentiment: 'positive', summary: '할인 시 가격이 괜찮다는 의견이 있습니다.' },
+        { name: '배송', sentiment: 'negative', summary: '배송 기간이 길거나 일정이 밀렸다는 의견이 있습니다.' },
+        { name: '포장', sentiment: 'negative', summary: '박스 눌림과 병 외관 손상 불만이 일부 있습니다.' },
+      ],
+    },
   },
   {
     id: '3',
@@ -94,6 +116,17 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://vitacost.com',
     rank: 3,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 68,
+      negative: 20,
+      other: 12,
+      summary: '가격 만족도는 높지만 배송 추적이 불편하다는 의견이 섞여 있습니다.',
+      topics: [
+        { name: '가격', sentiment: 'positive', summary: '같은 제품 대비 저렴하게 샀다는 반응이 많습니다.' },
+        { name: '배송', sentiment: 'negative', summary: '배송 추적이 늦게 갱신된다는 의견이 있습니다.' },
+        { name: '재구매', sentiment: 'positive', summary: '가격이 유지되면 재구매하겠다는 의견이 있습니다.' },
+      ],
+    },
   },
   {
     id: '4',
@@ -104,6 +137,16 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://amazon.com',
     rank: 1,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 70,
+      negative: 19,
+      other: 11,
+      summary: '성분 구성 만족도가 높고, 배송 관련 불만은 일부 있습니다.',
+      topics: [
+        { name: '성분', sentiment: 'positive', summary: 'B군과 비타민 C 구성이 좋다는 의견이 많습니다.' },
+        { name: '배송', sentiment: 'negative', summary: '해외배송 기간 편차가 있다는 의견이 있습니다.' },
+      ],
+    },
   },
   {
     id: '5',
@@ -114,6 +157,16 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://iherb.com',
     rank: 2,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 78,
+      negative: 12,
+      other: 10,
+      summary: '정품 신뢰와 배송 만족도가 높다는 의견이 많습니다.',
+      topics: [
+        { name: '신뢰도', sentiment: 'positive', summary: '정품이라고 느낀다는 의견이 많습니다.' },
+        { name: '배송', sentiment: 'positive', summary: '배송이 빠르고 안정적이라는 반응입니다.' },
+      ],
+    },
   },
   {
     id: '6',
@@ -124,6 +177,16 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://vitacost.com',
     rank: 1,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 52,
+      negative: 36,
+      other: 12,
+      summary: '가격은 괜찮지만 상품 안전성 이슈와 배송 불만이 함께 언급됩니다.',
+      topics: [
+        { name: '안전성', sentiment: 'negative', summary: '성분에 대한 우려가 반복적으로 언급됩니다.' },
+        { name: '배송', sentiment: 'negative', summary: '배송 중 포장 손상 의견이 있습니다.' },
+      ],
+    },
   },
   {
     id: '7',
@@ -134,6 +197,16 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://iherb.com',
     rank: 1,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 81,
+      negative: 9,
+      other: 10,
+      summary: '맛과 복용 편의성보다 성분 함량 만족도가 높게 언급됩니다.',
+      topics: [
+        { name: '함량', sentiment: 'positive', summary: '1,000mg 함량을 선호한다는 의견이 많습니다.' },
+        { name: '배송', sentiment: 'positive', summary: '배송 속도와 포장 상태가 좋다는 의견이 많습니다.' },
+      ],
+    },
   },
   {
     id: '8',
@@ -144,6 +217,17 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://amazon.com',
     rank: 2,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 58,
+      negative: 30,
+      other: 12,
+      summary: '제품은 괜찮지만 병 파손, 배송 지연 같은 판매처 경험 불만이 보입니다.',
+      topics: [
+        { name: '제품', sentiment: 'positive', summary: '제품 자체는 만족한다는 의견이 있습니다.' },
+        { name: '배송', sentiment: 'negative', summary: '도착이 늦었다는 의견이 반복됩니다.' },
+        { name: '포장', sentiment: 'negative', summary: '병이 흔들리거나 포장이 약했다는 의견이 있습니다.' },
+      ],
+    },
   },
   {
     id: '9',
@@ -154,6 +238,16 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://amazon.com',
     rank: 1,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 64,
+      negative: 25,
+      other: 11,
+      summary: '맛과 단백질 함량 만족도는 높지만 알레르기 우려 댓글이 일부 있습니다.',
+      topics: [
+        { name: '맛', sentiment: 'positive', summary: '식물성 단백질치고 맛이 괜찮다는 의견이 많습니다.' },
+        { name: '주의', sentiment: 'negative', summary: '견과류 관련 알레르기를 걱정하는 의견이 있습니다.' },
+      ],
+    },
   },
   {
     id: '10',
@@ -164,15 +258,18 @@ export const mockProductOffers: ProductOffer[] = [
     url: 'https://vitacost.com',
     rank: 2,
     crawledAt: '2026-05-30T00:00:00+09:00',
+    reviewSummary: {
+      positive: 69,
+      negative: 18,
+      other: 13,
+      summary: '가격 만족도가 높고 배송은 무난하다는 의견이 많습니다.',
+      topics: [
+        { name: '가격', sentiment: 'positive', summary: '할인 시 구매 만족도가 높다는 의견이 있습니다.' },
+        { name: '배송', sentiment: 'other', summary: '배송 평가는 무난한 편입니다.' },
+      ],
+    },
   },
 ];
-
-export const mockReviewSummary: ReviewSummary = {
-  positive: 72,
-  negative: 18,
-  other: 10,
-  summary: '가격은 저렴하다는 의견이 많지만, 배송 지연에 대한 불만도 일부 있습니다.',
-};
 
 export const mockGroups: Group[] = [
   {
@@ -208,11 +305,13 @@ export const mockCurrentUser = {
   isOnboarded: true,
   onboardingInfo: {
     isPregnant: false,
+    hasHypertension: false,
+    hasHyperlipidemia: true,
+    hasDiabetes: false,
     isBreastfeeding: false,
     isChild: false,
     isElderly: false,
     isCaffeineSensitive: true,
-    hasSpecificAllergies: false,
     additionalNotes: '',
   },
 };

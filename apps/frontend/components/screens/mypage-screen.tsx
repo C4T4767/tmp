@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, LogOut, Edit, FileText, ClipboardList } from 'lucide-react';
+import { ChevronRight, LogOut, Edit, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { mockCurrentUser } from '@/lib/mock-data';
@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 const menuItems = [
   { href: '/mypage/nickname', label: '닉네임 변경', icon: Edit },
   { href: '/onboarding', label: '온보딩 수정', icon: ClipboardList },
-  { href: '/mypage/comments', label: '내 댓글 목록', icon: FileText },
 ];
 
 export function MyPageScreen() {
@@ -24,26 +23,7 @@ export function MyPageScreen() {
       {/* User Info */}
       <Card>
         <CardContent className="p-4">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <span className="text-2xl font-bold text-primary">
-                {user.nickname.charAt(0)}
-              </span>
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">{user.nickname}</h2>
-              <span
-                className={cn(
-                  'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                  user.isOnboarded
-                    ? 'bg-success/10 text-success'
-                    : 'bg-warning/10 text-warning-foreground'
-                )}
-              >
-                온보딩 {user.isOnboarded ? '완료' : '미완료'}
-              </span>
-            </div>
-          </div>
+          <h2 className="text-lg font-semibold text-foreground">{user.nickname}</h2>
         </CardContent>
       </Card>
 
