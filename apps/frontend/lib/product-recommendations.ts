@@ -37,11 +37,11 @@ export function getGeneralRecommendationSections(productId: string): Recommendat
 
   return [
     {
-      title: '비슷한 목적으로 비교',
+      title: '유사 상품',
       items: similarPurposeProducts,
     },
     {
-      title: '이 상품을 본 사람들이 함께 본 상품',
+      title: '함께 본 상품',
       items: viewedTogetherProducts,
     },
   ].filter((section) => section.items.length > 0);
@@ -100,7 +100,7 @@ function getSimilarPurposeProducts(productId: string, limit: number): Recommende
       bestOffer,
       reason:
         sharedPurposeTags.length > 0
-          ? `목적 유사: ${sharedPurposeTags.join(', ')}`
+          ? sharedPurposeTags.join(', ')
           : sharedIngredientCount > 0
             ? '비슷한 성분 구성'
             : '함께 비교하기 좋은 상품',

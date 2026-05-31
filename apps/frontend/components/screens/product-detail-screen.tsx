@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   AlertTriangle,
-  ArrowLeft,
   Check,
+  ChevronLeft,
   ChevronDown,
   ExternalLink,
   Heart,
@@ -68,23 +68,23 @@ const mockGroupIngredientRiskReasons: Record<
 };
 
 const ingredientStatusConfig: Record<SafetyStatus, { label: string; className: string }> = {
-  safe: { label: '안전', className: 'border-secondary bg-secondary/45 text-primary' },
-  caution: { label: '주의 필요', className: 'border-warning/20 bg-warning/10 text-warning-foreground' },
-  blocked: { label: '반입차단', className: 'border-destructive/20 bg-destructive/10 text-destructive' },
+  safe: { label: '안전', className: 'border-[#d8e4f2] bg-[#f5f9fd] text-primary' },
+  caution: { label: '주의 필요', className: 'border-[#f2d8a8] bg-[#fff8ec] text-primary' },
+  blocked: { label: '반입차단', className: 'border-[#f1b8b2] bg-[#fff1ef] text-[#b42318]' },
   'user-risk': {
     label: '내 정보 주의',
-    className: 'border-destructive/15 bg-destructive/5 text-destructive',
+    className: 'border-[#f1b8b2] bg-[#fff1ef] text-[#b42318]',
   },
   'group-caution': {
     label: '그룹원 주의',
-    className: 'border-warning/20 bg-warning/10 text-warning-foreground',
+    className: 'border-[#f2d8a8] bg-[#fff8ec] text-primary',
   },
 };
 
 const reviewTopicStyle = {
-  positive: 'text-success',
-  negative: 'text-destructive',
-  other: 'text-muted-foreground',
+  positive: 'border-[#ccefdc] bg-[#f1fbf5] text-[#12814d]',
+  negative: 'border-[#f1b8b2] bg-[#fff1ef] text-[#b42318]',
+  other: 'border-[#d8e4f2] bg-white text-primary',
 };
 
 const personalRiskReasons: Record<string, string> = {
@@ -189,15 +189,16 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
       <Link
         key={recommendedProduct.id}
         href={`/product/${recommendedProduct.id}`}
-        className="flex gap-3 rounded-lg border border-border bg-card p-3 active:bg-muted"
+        className="flex gap-3 rounded-[18px] bg-white p-3 shadow-[0_8px_24px_rgba(10,37,64,0.05)] active:bg-[#f8fbff]"
       >
-        <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
+        <span className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-[16px] bg-[#f8fbff]">
           {recommendedProduct.imageUrl ? (
             <img
               src={recommendedProduct.imageUrl}
               alt={`${recommendedProduct.name} 상품 이미지`}
-              className="h-full w-full object-contain p-1.5"
+              className="h-full w-full object-contain p-2"
               loading="lazy"
+              referrerPolicy="no-referrer"
             />
           ) : (
             <Package className="h-6 w-6 text-muted-foreground" />
@@ -210,7 +211,9 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
             </span>
             <SafetyBadge status={recommendedProduct.status} className="flex-shrink-0" />
           </span>
-          <span className="mt-2 block text-xs leading-5 text-muted-foreground">{reason}</span>
+          <span className="mt-2 inline-flex rounded-full bg-[#f4f7fb] px-2 py-1 text-[0.7rem] font-medium text-primary/65">
+            {reason}
+          </span>
           <span className="mt-1 block text-sm font-semibold text-primary">
             배송비 포함 {formatWon(totalPrice)}
           </span>
@@ -220,36 +223,49 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <section className="bg-primary text-primary-foreground">
-        <div className="flex h-11 items-center justify-between border-b border-white/15 px-4">
+    <div className="min-h-screen bg-background px-4 pb-24">
+      <section className="pt-4">
+        <div className="flex items-center justify-between">
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex size-9 items-center justify-center rounded-full text-primary-foreground active:bg-white/10"
+            className="inline-flex h-9 w-9 items-center justify-center text-primary/80 transition-colors active:text-primary"
             aria-label="이전 화면"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ChevronLeft className="h-6 w-6" strokeWidth={1.9} />
           </button>
-          <Link
-            href="/"
-            className="inline-flex size-9 items-center justify-center rounded-full text-primary-foreground active:bg-white/10"
-            aria-label="홈으로 이동"
-          >
-            <X className="h-5 w-5" />
-          </Link>
         </div>
 
-        <div className="px-5 pb-16 pt-5">
-          <h1 className="max-w-[18rem] text-[1.62rem] font-bold leading-tight">
-            {product.name}
-          </h1>
-          <p className="mt-2 text-sm text-primary-foreground/72">{product.variantLabel}</p>
-          <div className="mt-5 flex items-center gap-2">
+        <div className="mt-5 rounded-[22px] bg-white p-4 shadow-[0_10px_28px_rgba(10,37,64,0.07)]">
+          <div className="grid grid-cols-[6rem_minmax(0,1fr)] gap-4">
+            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-[20px] bg-[#f8fbff]">
+              {product.imageUrl ? (
+                <img
+                  src={product.imageUrl}
+                  alt={`${product.name} 상품 이미지`}
+                  className="h-full w-full object-contain p-2"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <Package className="h-8 w-8 text-primary/35" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <SafetyBadge status={product.status} className="mb-2" />
+              <h1 className="line-clamp-3 text-[1.22rem] font-semibold leading-tight text-primary">
+                {product.name}
+              </h1>
+              <p className="mt-2 text-[0.82rem] font-medium leading-5 text-muted-foreground">
+                {product.variantLabel}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleFavoriteToggle}
-              className="inline-flex h-9 min-w-0 items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 text-xs font-medium text-primary-foreground active:bg-white/15"
+              className="inline-flex h-9 min-w-0 items-center gap-2 rounded-full border border-[#d9e3f2] bg-white px-3 text-[0.78rem] font-medium text-primary active:bg-[#f8fbff]"
             >
               <Heart
                 className={cn('h-4 w-4 flex-shrink-0', isFavorite && 'fill-current')}
@@ -258,31 +274,25 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
                 {isFavorite ? `관심품목 담김 · ${favoriteStoreLabel}` : '관심품목 담기'}
               </span>
             </button>
-            <span className="inline-flex h-8 items-center rounded-full border border-white/15 px-3 text-[11px] text-primary-foreground/78">
-              최저가 기준
-            </span>
-            <span className="inline-flex h-8 items-center rounded-full border border-white/15 px-3 text-[11px] text-primary-foreground/78">
-              배송비 기준
-            </span>
           </div>
         </div>
       </section>
 
-      <div className="-mt-10 flex flex-col gap-7 px-5">
-        <section className="rounded-xl bg-card p-4 shadow-lg shadow-primary/10">
-          <p className="mb-3 text-xs text-muted-foreground">안전 확인 대상</p>
+      <div className="mt-5 flex flex-col gap-6">
+        <section className="rounded-[20px] bg-white p-4 shadow-[0_8px_24px_rgba(10,37,64,0.05)]">
+          <p className="mb-3 text-[0.78rem] font-medium text-muted-foreground">안전 확인 대상</p>
           <div className="relative">
             <button
               type="button"
               onClick={() => setIsGroupDropdownOpen((isOpen) => !isOpen)}
-              className="flex w-full items-center justify-between rounded-lg bg-background p-3 text-left"
+              className="flex w-full items-center justify-between rounded-[16px] bg-[#f8fbff] p-3 text-left"
             >
               <span className="flex items-center gap-3">
-                <span className="flex size-10 items-center justify-center rounded-lg bg-success/10 text-success">
-                  <Users className="h-5 w-5" />
+                <span className="flex size-10 items-center justify-center rounded-full bg-white text-primary shadow-[0_6px_18px_rgba(10,37,64,0.05)]">
+                  <Users className="h-5 w-5" strokeWidth={1.8} />
                 </span>
                 <span>
-                  <span className="block text-base font-semibold text-foreground">
+                  <span className="block text-[0.98rem] font-semibold text-primary">
                     {selectedGroup ? selectedGroup.name : '그룹 선택'}
                   </span>
                   {selectedGroup && (
@@ -325,99 +335,89 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-foreground">종합 위험 판단</h2>
-          <div className="mt-5 space-y-4">
-            <div className="grid grid-cols-[2rem_1fr] gap-3">
-              <div className="flex flex-col items-center">
-                <span className="flex size-7 items-center justify-center rounded-md bg-secondary text-primary">
-                  <Check className="h-4 w-4" />
-                </span>
-                <span className="mt-2 h-12 border-l border-dashed border-muted-foreground/35" />
-              </div>
-              <div className="rounded-lg border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[1.08rem] font-semibold text-primary">안전 확인 결과</h2>
+            <span className="text-[0.72rem] font-medium text-muted-foreground">3개 항목</span>
+          </div>
+          <div className="mt-3 divide-y divide-[#edf2f8] rounded-[20px] bg-white px-4 shadow-[0_8px_24px_rgba(10,37,64,0.05)]">
+            <div className="flex items-center justify-between gap-3 py-4">
+              <div>
                 <SafetyBadge status={hasBlockedIngredient ? 'blocked' : 'safe'} />
-                <p className="mt-2 text-sm font-medium text-foreground">국내 반입차단 여부</p>
+                <p className="mt-2 text-[0.94rem] font-medium text-primary">국내 반입차단 여부</p>
               </div>
+              <Check className="h-5 w-5 text-primary/35" />
             </div>
 
-            <div className="grid grid-cols-[2rem_1fr] gap-3">
-              <div className="flex flex-col items-center">
-                <span className="flex size-7 items-center justify-center rounded-md bg-warning/15 text-warning-foreground">
-                  <AlertTriangle className="h-4 w-4" />
-                </span>
-                <span className="mt-2 h-12 border-l border-dashed border-muted-foreground/35" />
-              </div>
-              <div className="rounded-lg border border-warning/15 bg-warning/5 p-4">
+            <div className="flex items-center justify-between gap-3 py-4">
+              <div>
                 <SafetyBadge status={hasUserRisk ? 'user-risk' : 'safe'} />
-                <p className="mt-2 text-sm font-medium text-foreground">내 정보 기준 위험</p>
+                <p className="mt-2 text-[0.94rem] font-medium text-primary">내 정보 기준 위험</p>
               </div>
+              <AlertTriangle className="h-5 w-5 text-primary/35" />
             </div>
 
             {selectedGroup && (
-              <div className="grid grid-cols-[2rem_1fr] gap-3">
-                <div className="flex justify-center">
-                  <span className="flex size-7 items-center justify-center rounded-md bg-warning/15 text-warning-foreground">
-                    <Users className="h-4 w-4" />
-                  </span>
-                </div>
-                <div className="rounded-lg border border-warning/20 bg-warning/5 p-4">
+              <div className="flex items-center justify-between gap-3 py-4">
+                <div>
                   <SafetyBadge status={hasGroupCaution ? 'group-caution' : 'safe'} />
-                  <p className="mt-2 text-sm font-medium text-foreground">
+                  <p className="mt-2 text-[0.94rem] font-medium text-primary">
                     {selectedGroup.name} 기준 위험
                   </p>
                 </div>
+                <Users className="h-5 w-5 text-primary/35" />
               </div>
             )}
           </div>
         </section>
 
         {(hasUserRisk || hasGroupCaution || hasBlockedIngredient) && (
-          <section className="rounded-lg border border-warning/20 bg-warning/5 p-4">
-            <div className="flex gap-3">
-              <AlertTriangle className="mt-1 h-5 w-5 flex-shrink-0 text-warning-foreground" />
-              <div className="min-w-0">
-                <p className="text-sm font-semibold leading-6 text-foreground">
-                  내 정보와 우리 가족 그룹원 정보 모두에서 주의가 필요합니다.
-                </p>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  내 정보 및 가족 그룹원의 섭취 정보와 건강 정보가 상세한 성분이 포함되어 있습니다.
-                  섭취 전 전문가와 상담을 권장합니다.
-                </p>
-                {groupRiskReason && (
-                  <div className="mt-4 rounded-lg bg-card p-3">
-                    <p className="text-sm font-semibold leading-6 text-foreground">
-                      {groupRiskReason.memberName}님은 {groupRiskReason.condition} 정보가 있어{' '}
-                      {groupRiskReason.ingredientName} 성분에 주의가 필요합니다.
-                    </p>
-                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                      {groupRiskReason.reason}
-                    </p>
-                  </div>
-                )}
-                {hasUserRisk && (
-                  <p className="mt-3 text-xs leading-5 text-muted-foreground">
+          <section className="rounded-[18px] bg-[#fff8ec] p-4">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4.5 w-4.5 flex-shrink-0 text-warning-foreground" />
+              <p className="text-[0.96rem] font-semibold text-primary">주의가 필요한 성분이 있어요</p>
+            </div>
+            <div className="mt-3 space-y-2">
+              {groupRiskReason && (
+                <div className="rounded-[14px] bg-white p-3">
+                  <p className="text-[0.86rem] font-semibold leading-5 text-primary">
+                    {groupRiskReason.memberName} · {groupRiskReason.condition}
+                  </p>
+                  <p className="mt-1 text-[0.78rem] font-medium leading-5 text-muted-foreground">
+                    {groupRiskReason.ingredientName} 성분 확인이 필요해요.
+                  </p>
+                </div>
+              )}
+              {hasUserRisk && personalRiskReasons[product.id] && (
+                <div className="rounded-[14px] bg-white p-3">
+                  <p className="text-[0.86rem] font-semibold leading-5 text-primary">내 정보 기준</p>
+                  <p className="mt-1 text-[0.78rem] font-medium leading-5 text-muted-foreground">
                     {personalRiskReasons[product.id]}
                   </p>
-                )}
-                {hasBlockedIngredient && (
-                  <p className="mt-3 text-xs font-semibold leading-5 text-destructive">
-                    국내 반입차단 대상 성분이 포함되어 구매 링크를 제공하지 않습니다.
+                </div>
+              )}
+              {hasBlockedIngredient && (
+                <div className="rounded-[14px] bg-white p-3">
+                  <p className="text-[0.86rem] font-semibold leading-5 text-destructive">
+                    국내 반입차단 성분 포함
                   </p>
-                )}
-              </div>
+                  <p className="mt-1 text-[0.78rem] font-medium leading-5 text-muted-foreground">
+                    구매 링크를 제공하지 않습니다.
+                  </p>
+                </div>
+              )}
             </div>
           </section>
         )}
 
         <section>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">성분 분석 결과</h2>
-            <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] text-muted-foreground">
-              옆으로 보기
+            <h2 className="text-[1.08rem] font-semibold text-primary">성분 분석 결과</h2>
+            <span className="text-[0.72rem] font-medium text-muted-foreground">
+              {product.ingredients.length}개
             </span>
           </div>
-          <div className="-mx-5 mt-4 overflow-x-auto px-5">
-            <div className="flex w-max gap-2 pb-2">
+          <div className="-mx-4 mt-3 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex w-max gap-2.5">
               {product.ingredients.map((ingredient) => {
                 const config = ingredientStatusConfig[ingredient.status];
 
@@ -425,16 +425,18 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
                   <div
                     key={`${ingredient.name}-${ingredient.amount}`}
                     className={cn(
-                      'h-[8.75rem] w-[6.4rem] rounded-xl border p-3',
+                      'min-h-[5.75rem] w-32 rounded-2xl border p-3 shadow-[0_6px_18px_rgba(10,37,64,0.035)]',
                       config.className
                     )}
                   >
-                    <span className="inline-flex rounded-md bg-card/70 px-2 py-1 text-[11px] font-medium">
+                    <span className="inline-flex rounded-full bg-white/80 px-2 py-0.5 text-[0.66rem] font-medium shadow-[0_3px_8px_rgba(10,37,64,0.05)]">
                       {config.label}
                     </span>
-                    <p className="mt-4 text-sm font-semibold leading-5">{ingredient.name}</p>
+                    <p className="mt-3 line-clamp-1 text-[0.92rem] font-semibold">
+                      {ingredient.name}
+                    </p>
                     {ingredient.amount && ingredient.unit && (
-                      <p className="mt-1 text-sm opacity-75">
+                      <p className="mt-1 text-[0.78rem] font-medium opacity-70">
                         {ingredient.amount}
                         {ingredient.unit}
                       </p>
@@ -448,28 +450,51 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
 
         {showPriceSection && (
           <section>
-            <h2 className="text-xl font-semibold text-foreground">가격 비교</h2>
-            <div className="mt-4 divide-y divide-border rounded-xl bg-card">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[1.08rem] font-semibold text-primary">가격 비교</h2>
+              <span className="text-[0.72rem] font-medium text-muted-foreground">
+                배송비 포함
+              </span>
+            </div>
+            <div className="mt-3 space-y-3">
               {priceInfos.map((price) => {
                 const isSavedOffer = savedOfferStores.includes(price.store);
                 const isReviewExpanded = expandedReviewOfferIds.includes(price.id);
+                const totalPrice = price.price + price.shipping;
 
                 return (
-                  <div key={price.id} className="p-4">
+                  <div
+                    key={price.id}
+                    className="rounded-[20px] bg-white p-4 shadow-[0_8px_24px_rgba(10,37,64,0.05)]"
+                  >
                     <div className="grid grid-cols-[1fr_auto] gap-3">
                       <div className="min-w-0">
-                        <p className="text-lg font-bold text-foreground">{price.store}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          배송비: {formatWon(price.shipping)}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-[1rem] font-semibold text-primary">{price.store}</p>
+                          {price.rank === 1 && (
+                            <span className="rounded-full bg-[#e8f8ef] px-2 py-0.5 text-[0.66rem] font-semibold text-[#12814d]">
+                              최저
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          <span className="rounded-full bg-[#f4f7fb] px-2 py-1 text-[0.68rem] font-medium text-primary/62">
+                            상품 {formatWon(price.price)}
+                          </span>
+                          <span className="rounded-full bg-[#f4f7fb] px-2 py-1 text-[0.68rem] font-medium text-primary/62">
+                            배송 {formatWon(price.shipping)}
+                          </span>
+                        </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-primary">{formatWon(price.price)}</p>
+                        <p className="text-[1.12rem] font-bold text-primary">
+                          {formatWon(totalPrice)}
+                        </p>
                         <a
                           href={price.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-1 inline-flex items-center justify-end gap-1 text-xs font-medium text-primary"
+                          className="mt-2 inline-flex items-center justify-end gap-1 text-[0.74rem] font-semibold text-primary/70"
                         >
                           이동하기
                           <ExternalLink className="h-3.5 w-3.5" />
@@ -477,12 +502,12 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
                       </div>
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between gap-2">
+                    <div className="mt-4 flex items-center justify-between gap-2">
                       {price.reviewSummary && (
                         <button
                           type="button"
                           onClick={() => handleReviewToggle(price.id)}
-                          className="flex min-w-0 flex-1 items-center gap-2 rounded-md text-left text-xs text-muted-foreground"
+                          className="flex min-w-0 flex-1 items-center gap-2 rounded-full bg-[#f8fbff] px-3 py-2 text-left text-[0.72rem] font-medium text-muted-foreground"
                         >
                           <MessageSquareText className="h-4 w-4 flex-shrink-0" />
                           <span className="truncate">
@@ -497,10 +522,14 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
                           />
                         </button>
                       )}
-                      <Button
-                        size="sm"
-                        variant={isSavedOffer ? 'default' : 'outline'}
-                        className="h-8 px-3 text-xs"
+                      <button
+                        type="button"
+                        className={cn(
+                          'flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[0.76rem] font-semibold transition-transform active:scale-[0.96]',
+                          isSavedOffer
+                            ? 'bg-primary text-white'
+                            : 'border border-[#d9e3f2] bg-white text-primary'
+                        )}
                         onClick={() => handleSaveOffer(price)}
                       >
                         {isSavedOffer ? (
@@ -509,21 +538,29 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
                           <ShoppingBag className="mr-1 h-3.5 w-3.5" />
                         )}
                         {isSavedOffer ? '담김' : '담기'}
-                      </Button>
+                      </button>
                     </div>
 
                     {price.reviewSummary && isReviewExpanded && (
-                      <div className="mt-3 rounded-lg bg-muted p-3">
-                        <p className="text-xs leading-5 text-muted-foreground">
+                      <div className="mt-3 rounded-[16px] border border-[#d8e4f2] bg-[#fbfdff] p-3.5">
+                        <p className="text-[0.78rem] font-medium leading-5 text-primary/74">
                           {price.reviewSummary.summary}
                         </p>
-                        <div className="mt-3 flex flex-col gap-2">
+                        <div className="mt-3 divide-y divide-[#e5edf7]">
                           {price.reviewSummary.topics.map((topic) => (
-                            <div key={`${price.id}-${topic.name}`}>
-                              <p className={cn('text-xs font-semibold', reviewTopicStyle[topic.sentiment])}>
+                            <div
+                              key={`${price.id}-${topic.name}`}
+                              className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2 py-2 first:pt-0 last:pb-0"
+                            >
+                              <span
+                                className={cn(
+                                  'inline-flex h-7 items-center justify-center rounded-full border px-2 text-[0.7rem] font-semibold',
+                                  reviewTopicStyle[topic.sentiment]
+                                )}
+                              >
                                 {topic.name}
-                              </p>
-                              <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+                              </span>
+                              <p className="text-[0.76rem] font-medium leading-5 text-primary/68">
                                 {topic.summary}
                               </p>
                             </div>
@@ -542,7 +579,7 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
           <section>
             <div className="flex items-center gap-2">
               <Search className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">대체상품 검색</h2>
+              <h2 className="text-[1.08rem] font-semibold text-primary">대체상품 검색</h2>
             </div>
             <div className="mt-3 flex flex-col gap-3">
               {alternativeProducts.map(renderRecommendedProduct)}
@@ -552,12 +589,12 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
 
         {!hasBlockedIngredient && recommendationSections.length > 0 && (
           <section>
-            <h2 className="text-lg font-semibold text-foreground">이런 상품은 어떤가요</h2>
-            <div className="mt-3 flex flex-col gap-5">
+            <h2 className="text-[1.08rem] font-semibold text-primary">유사 상품 추천</h2>
+            <div className="mt-3 flex flex-col gap-4">
               {recommendationSections.map((section) => (
                 <div key={section.title}>
-                  <h3 className="text-sm font-semibold text-foreground">{section.title}</h3>
-                  <div className="mt-2 flex flex-col gap-3">
+                  <h3 className="mb-2 text-[0.8rem] font-medium text-muted-foreground">{section.title}</h3>
+                  <div className="flex flex-col gap-3">
                     {section.items.map(renderRecommendedProduct)}
                   </div>
                 </div>

@@ -2,18 +2,14 @@
 
 import { useState } from 'react';
 import {
-  ArrowLeft,
+  ChevronLeft,
   Link2,
-  Clipboard,
   CheckCircle,
   Loader2,
   Search,
-  ShieldCheck,
   Store,
   FileSearch,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -28,7 +24,7 @@ import { cn } from '@/lib/utils';
 const analysisSteps = [
   { label: '상품 정보 수집', icon: Store },
   { label: '성분 추출', icon: FileSearch },
-  { label: '공공데이터 안전 검증', icon: ShieldCheck },
+  { label: '안전 기준 확인', icon: CheckCircle },
   { label: '대체 판매처 탐색', icon: Search },
   { label: '매칭 완료', icon: CheckCircle },
 ];
@@ -40,10 +36,12 @@ export function ImportScreen() {
   const [result, setResult] = useState<{
     name: string;
     status: string;
-    storeCount: number;
-    lowestTotalPrice: number;
-    matchedStores: string[];
-    unmatchedStores: string[];
+    imageUrl: string;
+    matchedOffers: {
+      store: string;
+      price: number;
+      shipping: number;
+    }[];
   } | null>(null);
 
   const handleAnalyze = async () => {
@@ -61,76 +59,75 @@ export function ImportScreen() {
     setResult({
       name: 'California Gold Nutrition Gold C 비타민 C 1,000mg',
       status: '분석 완료',
-      storeCount: 2,
-      lowestTotalPrice: 23000,
-      matchedStores: ['iHerb', 'Coupang'],
-      unmatchedStores: ['Amazon', '11번가'],
+      imageUrl: '/product-images/california-gold-vitamin-c.jpg',
+      matchedOffers: [
+        { store: 'iHerb', price: 18500, shipping: 4500 },
+        { store: 'Coupang', price: 19900, shipping: 3000 },
+      ],
     });
     setCurrentStep(analysisSteps.length);
     setIsAnalyzing(false);
   };
 
-  const handlePasteFromClipboard = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      setUrl(text);
-    } catch {
-      console.log('[v0] Clipboard access denied');
-    }
-  };
-
   return (
-    <div className="flex flex-col gap-4 p-4 pb-24">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button asChild variant="ghost" size="icon">
-          <Link href="/">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <h1 className="text-lg font-semibold">상품 링크로 분석하기</h1>
-      </div>
+    <div className="flex flex-col gap-5 p-4 pb-24">
+      <header className="space-y-4">
+        <Link
+          href="/"
+          aria-label="홈으로 돌아가기"
+          className="inline-flex w-fit items-center gap-1.5 text-[0.86rem] font-medium text-primary/72 transition-colors active:text-primary"
+        >
+          <ChevronLeft className="h-6 w-6" strokeWidth={1.9} />
+        </Link>
+        <div className="space-y-1.5">
+          <p className="text-[0.74rem] font-medium text-muted-foreground">링크 분석</p>
+          <h1 className="text-[1.5rem] font-semibold leading-tight text-primary">
+            상품 링크로 분석하기
+          </h1>
+          <p className="text-[0.84rem] font-medium leading-5 text-muted-foreground">
+            상품 URL을 붙여넣으면 정보와 성분을 확인해요.
+          </p>
+        </div>
+      </header>
 
-      <Card className="border-primary/20 bg-primary/5">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Link2 className="h-5 w-5 text-primary" />
-            URL로 상품 분석
-          </CardTitle>
-          <CardDescription>
-            상품 정보와 성분을 확인한 뒤 비교 가능한 판매처를 찾아드립니다.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      <Card>
-        <CardContent className="flex flex-col gap-3 p-4">
-          <Input
-            type="url"
-            placeholder="상품 URL을 붙여넣으세요"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
+      <section className="rounded-[20px] bg-white p-4 shadow-[0_8px_24px_rgba(10,37,64,0.05)]">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f5f7fa] text-primary/82">
+            <Link2 className="h-5 w-5" strokeWidth={1.85} />
+          </span>
+          <div>
+            <h2 className="text-[0.98rem] font-semibold text-primary">URL로 상품 분석</h2>
+            <p className="mt-0.5 text-[0.76rem] font-medium text-muted-foreground">
+              iHerb, Amazon 등 상품 링크를 지원해요.
+            </p>
+          </div>
+        </div>
+        <div>
           <div className="grid grid-cols-[1fr_auto] gap-2">
-            <Button
+            <Input
+              type="url"
+              placeholder="상품 URL 입력"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="h-12 rounded-[16px] border-[#d9e3f2] bg-[#f8fbff] px-4 text-[0.95rem] shadow-none focus-visible:ring-2 focus-visible:ring-accent/35"
+            />
+            <button
+              type="button"
               onClick={handleAnalyze}
               disabled={!url.trim() || isAnalyzing}
+              className="flex h-12 shrink-0 items-center justify-center rounded-[16px] bg-primary px-4 text-[0.9rem] font-semibold text-white shadow-[0_10px_20px_rgba(10,37,64,0.14)] transition-transform active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-primary/35 disabled:shadow-none"
             >
               {isAnalyzing ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  분석 중...
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 </>
               ) : (
-                '분석하기'
+                '확인'
               )}
-            </Button>
-            <Button variant="outline" size="icon" onClick={handlePasteFromClipboard}>
-              <Clipboard className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       <Dialog open={isAnalyzing}>
         <DialogContent
@@ -193,36 +190,59 @@ export function ImportScreen() {
       </Dialog>
 
       {result && (
-        <Card className="border-success/30 bg-success/5">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-5 w-5 flex-shrink-0 text-success" />
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-foreground">{result.name}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{result.status}</p>
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <div className="rounded-md border border-success/20 bg-background p-2">
-                    <p className="text-xs text-muted-foreground">검증 판매처</p>
-                    <p className="mt-1 text-sm font-bold text-foreground">{result.storeCount}곳</p>
-                  </div>
-                  <div className="rounded-md border border-success/20 bg-background p-2">
-                    <p className="text-xs text-muted-foreground">최저가</p>
-                    <p className="mt-1 text-sm font-bold text-primary">
-                      {result.lowestTotalPrice.toLocaleString()}원
+        <section className="rounded-[20px] bg-white p-4 shadow-[0_8px_24px_rgba(10,37,64,0.05)]">
+          <div className="grid grid-cols-[5.25rem_minmax(0,1fr)] gap-3">
+            <div className="flex h-[5.25rem] w-[5.25rem] items-center justify-center overflow-hidden rounded-[18px] bg-[#f8fbff]">
+              <img
+                src={result.imageUrl}
+                alt={`${result.name} 상품 이미지`}
+                className="h-full w-full object-contain p-2"
+                loading="lazy"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+            <div className="min-w-0">
+              <p className="line-clamp-2 font-semibold leading-snug text-primary">{result.name}</p>
+              <p className="mt-1 text-[0.78rem] font-medium text-[#12814d]">{result.status}</p>
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[0.86rem] font-semibold text-primary">매칭된 판매처</h2>
+              <span className="text-[0.72rem] font-medium text-muted-foreground">
+                {result.matchedOffers.length}곳
+              </span>
+            </div>
+            {result.matchedOffers.map((offer) => {
+              const totalPrice = offer.price + offer.shipping;
+
+              return (
+                <div
+                  key={offer.store}
+                  className="flex items-center justify-between rounded-[14px] bg-[#f8fbff] px-3 py-2.5"
+                >
+                  <div>
+                    <p className="text-[0.88rem] font-semibold text-primary">{offer.store}</p>
+                    <p className="mt-0.5 text-[0.72rem] font-medium text-muted-foreground">
+                      상품 {offer.price.toLocaleString()}원 · 배송 {offer.shipping.toLocaleString()}원
                     </p>
                   </div>
+                  <p className="shrink-0 text-[0.94rem] font-semibold text-primary">
+                    {totalPrice.toLocaleString()}원
+                  </p>
                 </div>
-                <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-                  <p>매칭됨: {result.matchedStores.join(', ')}</p>
-                  <p>매칭 없음: {result.unmatchedStores.join(', ')}</p>
-                </div>
-                <Button asChild size="sm" className="mt-3">
-                  <Link href="/product/1">상세페이지 보기</Link>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              );
+            })}
+          </div>
+
+          <Link
+            href="/product/1"
+            className="mt-4 flex h-10 items-center justify-center rounded-full bg-primary text-[0.86rem] font-semibold text-white"
+          >
+            분석결과 보기
+          </Link>
+        </section>
       )}
 
     </div>
