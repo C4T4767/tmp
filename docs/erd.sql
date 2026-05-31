@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS vector;
+
 CREATE TYPE user_role AS ENUM (
   'USER', -- 일반 사용자
   'ADMIN' -- 관리자
@@ -265,6 +267,18 @@ CREATE TABLE ingredient_public_sources (
   UNIQUE (ingredient_id, source_type) -- 성분당 공공 API별 근거는 하나만 유지
 );
 
+CREATE TABLE ingredient_purpose_tags (
+  id UUID PRIMARY KEY, -- 성분 목적 태그 ID
+  ingredient_id UUID NOT NULL REFERENCES ingredients(id), -- 목적 태그가 연결된 성분 ID
+  purpose_tag VARCHAR(50) NOT NULL, -- 표준화된 기능성 또는 섭취 목적 태그
+  source_type ingredient_public_source_type, -- 태그 추출에 사용한 공공데이터 유형
+  source_text TEXT NOT NULL, -- 태그 추출 근거가 된 기능성 원문 또는 요약 문구
+  confidence NUMERIC(4, 3) NOT NULL DEFAULT 1, -- 규칙 또는 AI가 부여한 태그 신뢰도
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(), -- 태그 생성 시각
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), -- 태그 수정 시각
+  UNIQUE (ingredient_id, purpose_tag) -- 같은 성분의 같은 목적 태그 중복 방지
+);
+
 CREATE TABLE product_ingredients (
   id UUID PRIMARY KEY, -- 상품 성분 ID
   product_id UUID NOT NULL REFERENCES products(id), -- 상품 ID
@@ -274,6 +288,49 @@ CREATE TABLE product_ingredients (
   amount_text VARCHAR(100), -- 성분 함량 원문
   unit VARCHAR(30), -- 성분 함량 단위
   source_text TEXT -- 성분 추출 근거 원문
+);
+
+CREATE TABLE product_purpose_tags (
+  id UUID PRIMARY KEY, -- 상품 목적 태그 ID
+  product_id UUID NOT NULL REFERENCES products(id), -- 상품 ID
+  purpose_tag VARCHAR(50) NOT NULL, -- 상품 목록과 추천에 표시할 기능성 또는 섭취 목적 태그
+  source VARCHAR(50) NOT NULL DEFAULT 'INGREDIENT_PUBLIC_SOURCE', -- 태그 생성 근거 유형
+  ingredient_count INTEGER NOT NULL DEFAULT 0, -- 이 목적 태그와 연결된 상품 성분 수
+  avg_confidence NUMERIC(4, 3) NOT NULL DEFAULT 1, -- 연결된 성분 목적 태그 confidence 평균
+  score NUMERIC(8, 4) NOT NULL DEFAULT 0, -- 대표 태그 정렬에 사용하는 집계 점수
+  sort_order INTEGER NOT NULL DEFAULT 0, -- 화면 표시 우선순위
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(), -- 태그 생성 시각
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), -- 태그 수정 시각
+  UNIQUE (product_id, purpose_tag) -- 같은 상품의 같은 목적 태그 중복 방지
+);
+
+CREATE TABLE product_embeddings (
+  product_id UUID PRIMARY KEY REFERENCES products(id), -- 임베딩 대상 상품 ID
+  embedding VECTOR(1536) NOT NULL, -- 상품명, 성분, 공공데이터 기능성 문구를 합친 상품 의미 임베딩
+  embedding_text TEXT NOT NULL, -- 임베딩 생성에 사용한 정규화 텍스트
+  embedding_model VARCHAR(100) NOT NULL, -- 임베딩 생성 모델명
+  embedded_at TIMESTAMPTZ NOT NULL DEFAULT now(), -- 임베딩 생성 시각
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now() -- 임베딩 갱신 시각
+);
+
+CREATE TABLE product_view_events (
+  id UUID PRIMARY KEY, -- 상품 조회 이벤트 ID
+  user_id UUID REFERENCES users(id), -- 로그인 사용자의 조회인 경우 사용자 ID
+  pseudonymous_session_id VARCHAR(100), -- 비로그인 또는 집계용 익명 세션 ID
+  product_id UUID NOT NULL REFERENCES products(id), -- 조회한 상품 ID
+  viewed_at TIMESTAMPTZ NOT NULL DEFAULT now(), -- 상품 상세를 조회한 시각
+  referrer_product_id UUID REFERENCES products(id) -- 추천 영역을 통해 진입한 경우 이전 상품 ID
+);
+
+CREATE TABLE product_view_recommendations (
+  id UUID PRIMARY KEY, -- 사용자 활동 기반 상품 추천 집계 ID
+  product_id UUID NOT NULL REFERENCES products(id), -- 기준 상품 ID
+  recommended_product_id UUID NOT NULL REFERENCES products(id), -- 함께 조회된 추천 상품 ID
+  co_view_count INTEGER NOT NULL DEFAULT 0, -- 같은 세션 또는 사용자 흐름에서 함께 조회된 횟수
+  score NUMERIC(10, 4) NOT NULL DEFAULT 0, -- 최신성, 조회 수 등을 반영한 추천 점수
+  time_window_days INTEGER NOT NULL DEFAULT 30, -- 집계에 사용한 조회 기간
+  calculated_at TIMESTAMPTZ NOT NULL DEFAULT now(), -- 집계 계산 시각
+  UNIQUE (product_id, recommended_product_id) -- 기준 상품별 추천 상품 중복 방지
 );
 
 CREATE TABLE product_ingredient_analyses (

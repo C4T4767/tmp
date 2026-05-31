@@ -13,6 +13,7 @@ export interface Product {
   price: number;
   imageUrl?: string;
   status: SafetyStatus;
+  purposeTags: string[];
   ingredients: Ingredient[];
 }
 

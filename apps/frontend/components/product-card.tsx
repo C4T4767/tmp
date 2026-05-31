@@ -41,6 +41,18 @@ export function ProductCard({
           <div className="flex flex-1 flex-col justify-between">
             <div>
               <h3 className="font-semibold text-foreground line-clamp-2">{product.name}</h3>
+              {product.purposeTags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {product.purposeTags.slice(0, 2).map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[11px] font-medium text-primary"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="mt-1 flex items-center justify-between gap-2">
                 <p className="text-lg font-bold text-primary">
                   {displayPrice.toLocaleString()}원

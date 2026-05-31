@@ -76,6 +76,18 @@ function ProductComparisonRow({ result }: { result: ProductSearchResult }) {
               성분명 매칭: {matchedIngredientName}
             </p>
           )}
+          {product.purposeTags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {product.purposeTags.slice(0, 2).map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[11px] font-medium text-primary"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {isBlockedProduct ? (

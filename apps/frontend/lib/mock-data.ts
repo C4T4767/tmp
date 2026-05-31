@@ -6,6 +6,7 @@ export const mockProducts: Product[] = [
     name: 'Nature Made 멀티비타민',
     price: 25900,
     status: 'user-risk',
+    purposeTags: ['종합 영양', '면역'],
     ingredients: [
       { name: '비타민 A', amount: '900', unit: 'mcg', status: 'safe' },
       { name: '비타민 C', amount: '90', unit: 'mg', status: 'user-risk' },
@@ -18,6 +19,7 @@ export const mockProducts: Product[] = [
     name: 'NOW Foods 오메가-3',
     price: 32500,
     status: 'caution',
+    purposeTags: ['혈행', '눈 건강'],
     ingredients: [
       { name: 'EPA', amount: '180', unit: 'mg', status: 'safe' },
       { name: 'DHA', amount: '120', unit: 'mg', status: 'safe' },
@@ -29,6 +31,7 @@ export const mockProducts: Product[] = [
     name: 'Swanson 프로바이오틱스',
     price: 28000,
     status: 'blocked',
+    purposeTags: ['장 건강', '체중 관리'],
     ingredients: [
       { name: '락토바실러스', amount: '10', unit: 'billion CFU', status: 'safe' },
       { name: '비피도박테리움', amount: '5', unit: 'billion CFU', status: 'safe' },
@@ -40,6 +43,7 @@ export const mockProducts: Product[] = [
     name: 'California Gold 비타민 C',
     price: 18500,
     status: 'user-risk',
+    purposeTags: ['면역', '항산화'],
     ingredients: [
       { name: '비타민 C', amount: '1000', unit: 'mg', status: 'safe' },
       { name: '카페인', amount: '80', unit: 'mg', status: 'user-risk' },
@@ -50,6 +54,7 @@ export const mockProducts: Product[] = [
     name: 'Garden of Life 프로틴',
     price: 45000,
     status: 'group-caution',
+    purposeTags: ['단백질 보충', '장 건강'],
     ingredients: [
       { name: '완두 단백질', amount: '20', unit: 'g', status: 'safe' },
       { name: '프로바이오틱스', amount: '3', unit: 'billion CFU', status: 'safe' },
