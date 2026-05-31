@@ -548,6 +548,8 @@ refresh token으로 새 access token과 refresh token을 발급한다.
 - 다른 쇼핑몰은 URL이 있으면 직접 수집하고, URL이 없으면 검색 결과 상위 10개를 후보로 수집한다.
 - 검색 후보는 LLM으로 같은 상품 여부를 검증한 뒤 통과한 것만 `product_offers`에 upsert한다.
 - 판매처별 댓글 수집이 가능하면 `product_offer_reviews`에 저장하고 AI 요약 결과를 판매처별로 저장한다.
+- 공공데이터 기능성 문구를 기반으로 `ingredient_purpose_tags`, `product_purpose_tags`를 생성하거나 갱신한다.
+- 상품명, 성분, 공공데이터 기능성 문구를 합친 정규화 텍스트로 상품 임베딩을 생성해 `product_embeddings`에 저장한다.
 - 분석 완료 시 `product_import_jobs.product_id`에 상품 ID를 저장한다.
 - 앱 공유하기로 들어온 URL도 같은 API를 사용한다.
 
@@ -559,6 +561,9 @@ refresh token으로 새 access token과 refresh token을 발급한다.
 - `product_offer_reviews`
 - `product_offer_review_summaries`
 - `product_offer_review_topics`
+- `ingredient_purpose_tags`
+- `product_purpose_tags`
+- `product_embeddings`
 
 ### GET /api/product-imports/{jobId}/events
 
@@ -683,6 +688,7 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
       "name": "Nature Made 멀티비타민",
       "imageUrl": null,
       "status": "SAFE",
+      "purposeTags": ["면역", "항산화"],
       "matchedIngredientName": "비타민 C",
       "offers": [
         {
@@ -700,6 +706,7 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
       "name": "Swanson 프로바이오틱스",
       "imageUrl": null,
       "status": "BLOCKED",
+      "purposeTags": ["장 건강"],
       "matchedIngredientName": null,
       "offers": []
     }
@@ -713,6 +720,7 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
 - 성분명 검색은 `ingredient_aliases.normalized_alias` 기준으로 표준 성분을 찾고, `product_ingredients`에서 해당 성분이 들어간 상품을 찾는다.
 - 상품명 검색 결과와 성분명 검색 결과가 같은 상품을 포함하면 `product_id` 기준으로 중복 제거한다.
 - 상품명과 성분명이 모두 매칭된 상품은 한 번만 응답한다.
+- `purposeTags`는 `product_purpose_tags`의 `score DESC`, `ingredient_count DESC`, `avg_confidence DESC`, `purpose_tag ASC` 기준 대표 태그를 최대 2개까지 내려준다.
 - `status`가 `BLOCKED`인 상품은 판매처 가격 대신 금지품목 경고를 표시한다.
 - `status`가 `BLOCKED`가 아닌 상품은 `offers`를 `totalPrice` 오름차순으로 표시한다.
 - `totalPrice`는 `price + shippingFee` 값이다.
@@ -726,6 +734,7 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
 - `ingredients`
 - `ingredient_aliases`
 - `product_ingredients`
+- `product_purpose_tags`
 
 ## 관심품목
 
@@ -751,7 +760,8 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
         "id": "product-id",
         "name": "Nature Made 멀티비타민",
         "imageUrl": null,
-        "status": "SAFE"
+        "status": "SAFE",
+        "purposeTags": ["종합 영양", "면역"]
       },
       "offer": {
         "id": "offer-id",
@@ -771,6 +781,7 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
 
 - 로그인 사용자의 `user_favorite_offers`를 조회한다.
 - `product_offers`, `products`를 조인해서 상품과 판매처 가격을 함께 내려준다.
+- `product_purpose_tags`에서 대표 목적 태그를 최대 2개까지 함께 내려준다.
 - 전체 관심품목에서는 사용자/그룹 기준 주의 상태를 계산하지 않는다.
 - `BLOCKED` 상품만 반입차단 의심으로 표시하고, 그 외 상품은 안전으로 표시한다.
 - 가격 정렬은 `totalPrice = price + shippingFee` 기준으로 한다.
@@ -780,6 +791,7 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
 - `user_favorite_offers`
 - `product_offers`
 - `products`
+- `product_purpose_tags`
 
 ### POST /api/favorites
 
@@ -853,7 +865,8 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
         "id": "product-id",
         "name": "Garden of Life 프로틴",
         "imageUrl": null,
-        "status": "GROUP_CAUTION"
+        "status": "GROUP_CAUTION",
+        "purposeTags": ["단백질 보충", "장 건강"]
       },
       "bestOffer": {
         "id": "offer-id",
@@ -874,6 +887,7 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
 
 - `group_favorite_products` 기준으로 그룹 관심 상품을 조회한다.
 - 판매처는 검증 완료된 `product_offers` 중 `totalPrice`가 가장 낮은 항목을 `bestOffer`로 내려준다.
+- `product_purpose_tags`에서 대표 목적 태그를 최대 2개까지 함께 내려준다.
 - 그룹원 기준 위험이 있으면 `GROUP_CAUTION`으로 표시한다.
 - 그룹원 기준 위험 계산은 상품 상세의 group-risk 흐름과 같은 `user_ingredient_cautions` 캐시를 사용한다.
 
@@ -882,6 +896,7 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
 - `group_favorite_products`
 - `products`
 - `product_offers`
+- `product_purpose_tags`
 - `group_members`
 - `user_onboardings`
 - `user_ingredient_cautions`
@@ -1119,6 +1134,7 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
     "name": "California Gold 비타민 C",
     "imageUrl": "https://example.com/product.jpg",
     "status": "CAUTION",
+    "purposeTags": ["면역", "항산화"],
     "canPurchase": true,
     "purchaseBlockedReason": null
   },
@@ -1205,6 +1221,46 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
         "fromCache": true
       }
     ]
+  },
+  "recommendations": {
+    "type": "GENERAL",
+    "title": "이런 상품은 어떤가요",
+    "sections": [
+      {
+        "type": "SIMILAR_PURPOSE",
+        "title": "비슷한 목적으로 비교",
+        "items": [
+          {
+            "id": "recommended-product-id",
+            "name": "Nature Made 멀티비타민",
+            "imageUrl": null,
+            "status": "SAFE",
+            "purposeTags": ["종합 영양", "면역"],
+            "sharedPurposeTags": ["면역"],
+            "similarityScore": 0.87,
+            "lowestTotalPrice": 30400,
+            "recommendationReason": "면역 목적 태그가 겹치고 성분 기능성 설명이 비슷한 상품입니다."
+          }
+        ]
+      },
+      {
+        "type": "VIEWED_TOGETHER",
+        "title": "이 상품을 본 사람들이 함께 본 상품",
+        "items": [
+          {
+            "id": "activity-recommended-product-id",
+            "name": "NOW Foods 오메가-3",
+            "imageUrl": null,
+            "status": "CAUTION",
+            "purposeTags": ["혈행", "눈 건강"],
+            "sharedPurposeTags": [],
+            "similarityScore": null,
+            "lowestTotalPrice": 37500,
+            "recommendationReason": "최근 사용자 조회 활동 기반 추천입니다."
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -1214,9 +1270,13 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
 - `products`에서 상품 기본 정보를 조회한다.
 - `product_offers`에서 판매처 가격을 조회하고 `totalPrice = price + shippingFee`를 계산한다.
 - `product_offer_review_summaries`와 `product_offer_review_topics`를 조회해 판매처별 댓글 요약을 `offers[].reviewSummary`에 포함한다.
+- 상품 상세 조회 이벤트는 추천 집계를 위해 `product_view_events`에 기록할 수 있다.
 - 로그인 사용자의 `user_favorite_offers`를 조회해서 판매처별 `isFavorite`과 `favoriteOfferIds`를 만든다.
 - `product_ingredients`와 `ingredients`를 조인해서 상품 성분 목록을 조회한다.
 - `product_ingredient_analyses`에서 성분별 최종 분석 결과를 조회한다.
+- `product_purpose_tags`에서 상품 대표 목적 태그를 조회한다.
+- 대표 목적 태그는 실제 저장된 성분 목적 태그 집계값인 `ingredient_count`, `avg_confidence`, `score`만 사용해 정렬한다.
+- `product_embeddings`에서 현재 상품의 임베딩을 조회한다.
 - 로그인 사용자의 최신 온보딩 버전을 조회한다.
 - 현재 사용자와 성분 조합마다 `user_id + ingredient_id + onboarding_version` 기준으로 `user_ingredient_cautions`를 조회한다.
 - 캐시가 없으면 성분별 최종 분석 결과와 사용자 온보딩 정보를 온보딩 조건 매칭 규칙으로 비교한다.
@@ -1236,6 +1296,16 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
 - 댓글 요약은 상품 전체가 아니라 판매처별로 내려준다.
 - 리뷰 수집/요약 데이터가 없는 판매처는 `offers[].reviewSummary = null`로 내려준다.
 - 최상위 `reviewSummary`는 사용하지 않는다.
+- 현재 상품이 `BLOCKED`이면 `recommendations.type = ALTERNATIVES`로 내려주고, 같은 목적 태그를 가진 `BLOCKED`가 아닌 상품을 `product_embeddings.embedding` pgvector 유사도 순으로 추천한다.
+- 현재 상품이 `BLOCKED`가 아니면 `recommendations.type = GENERAL`로 내려주고, `SIMILAR_PURPOSE`와 `VIEWED_TOGETHER` 섹션을 함께 내려줄 수 있다.
+- `SIMILAR_PURPOSE`는 같은 목적 태그를 가진 상품을 후보로 좁힌 뒤 `product_embeddings.embedding` pgvector 유사도 순으로 정렬한다.
+- `VIEWED_TOGETHER`는 `product_view_recommendations`의 사용자 조회 활동 집계 결과를 사용한다.
+- `VIEWED_TOGETHER`는 함께 조회된 행동 데이터만 근거로 한다.
+- 추천 상품의 `lowestTotalPrice`는 검증 완료된 판매처의 `price + shippingFee` 최저값이다.
+- `SIMILAR_PURPOSE`는 목적 태그 후보가 없으면 pgvector 유사도, 같은 성분, 같은 제품 라인, 비슷한 가격대 순으로 보조 후보를 찾을 수 있다.
+- 추천 시점에는 AI를 다시 호출하지 않고 저장된 목적 태그와 임베딩을 사용한다.
+- `VIEWED_TOGETHER`는 사용자 활동 집계 후보가 없으면 빈 배열로 내려주거나 섹션 자체를 생략한다.
+- 추천 후보가 없는 섹션은 빈 배열로 내려주거나 섹션 자체를 생략할 수 있다.
 
 #### Related Tables
 
@@ -1246,6 +1316,10 @@ data: {"message":"상품 정보를 분석하지 못했습니다."}
 - `ingredients`
 - `product_ingredients`
 - `product_ingredient_analyses`
+- `product_purpose_tags`
+- `product_embeddings`
+- `product_view_events`
+- `product_view_recommendations`
 - `user_favorite_offers`
 - `groups`
 - `group_members`
