@@ -198,6 +198,45 @@ export function FavoritesScreen() {
       },
       purchasedAt: '2026-05-30T00:00:00+09:00',
     },
+    {
+      id: 'purchase-2',
+      groupId: '1',
+      buyerName: '홍길동',
+      product: mockProducts[3],
+      priceInfo: {
+        store: 'iHerb',
+        price: 18500,
+        shipping: 4500,
+        url: 'https://iherb.com',
+      },
+      purchasedAt: '2026-05-28T00:00:00+09:00',
+    },
+    {
+      id: 'purchase-3',
+      groupId: '1',
+      buyerName: '김민준',
+      product: mockProducts[1],
+      priceInfo: {
+        store: 'Amazon',
+        price: 32500,
+        shipping: 5000,
+        url: 'https://amazon.com',
+      },
+      purchasedAt: '2026-05-24T00:00:00+09:00',
+    },
+    {
+      id: 'purchase-4',
+      groupId: '1',
+      buyerName: '이서연',
+      product: mockProducts[4],
+      priceInfo: {
+        store: 'Amazon',
+        price: 45000,
+        shipping: 5000,
+        url: 'https://amazon.com',
+      },
+      purchasedAt: '2026-05-19T00:00:00+09:00',
+    },
   ]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
