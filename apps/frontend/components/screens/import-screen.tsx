@@ -14,17 +14,23 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 const analysisSteps = [
-  { event: 'STORE_DETECTED', label: '쇼핑몰 확인', icon: Store },
-  { event: 'SOURCE_CRAWLED', label: '원본 상품 정보 수집', icon: Link2 },
-  { event: 'INGREDIENTS_EXTRACTED', label: '성분 추출', icon: FileSearch },
-  { event: 'SAFETY_ANALYZED', label: '공공데이터 안전 분석', icon: ShieldCheck },
-  { event: 'PRICE_CANDIDATES_SEARCHED', label: '다른 쇼핑몰 가격 후보 검색', icon: Search },
-  { event: 'OFFERS_MATCHED', label: '같은 상품 여부 검증', icon: CheckCircle },
+  { label: '상품 정보 수집', icon: Store },
+  { label: '성분 추출', icon: FileSearch },
+  { label: '공공데이터 안전 검증', icon: ShieldCheck },
+  { label: '대체 판매처 탐색', icon: Search },
+  { label: '매칭 완료', icon: CheckCircle },
 ];
 
 export function ImportScreen() {
@@ -126,54 +132,65 @@ export function ImportScreen() {
         </CardContent>
       </Card>
 
-      {(isAnalyzing || result) && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">분석 진행 상태</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-3">
+      <Dialog open={isAnalyzing}>
+        <DialogContent
+          showCloseButton={false}
+          className="w-[calc(100%-3rem)] max-w-[21rem] rounded-md border-0 bg-white px-8 py-10 shadow-2xl"
+        >
+          <DialogHeader className="items-center text-center">
+            <DialogTitle className="text-xl font-semibold leading-7 text-primary">
+              상품을 분석하고 있습
+              <br />
+              니다...
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              상품 링크 분석 진행 상태입니다.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mx-auto mt-14 w-full max-w-[12.5rem]">
+            <div className="flex flex-col gap-5">
               {analysisSteps.map((step, index) => {
-                const Icon = step.icon;
-                const isDone = currentStep > index || Boolean(result);
-                const isCurrent = isAnalyzing && currentStep === index;
+                const isDone = currentStep > index;
+                const isCurrent = currentStep === index;
 
                 return (
-                  <div key={step.label} className="flex items-center gap-3">
-                    <div
+                  <div key={step.label} className="grid grid-cols-[1.25rem_1fr] items-center gap-4">
+                    <span
                       className={cn(
-                        'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border',
-                        isDone && 'border-success bg-success text-success-foreground',
-                        isCurrent && 'border-primary bg-primary/10 text-primary',
-                        !isDone && !isCurrent && 'border-border bg-muted text-muted-foreground'
+                        'relative flex size-5 items-center justify-center rounded-full',
+                        isDone && 'bg-[#6da6cf] text-white',
+                        isCurrent && 'border-[5px] border-primary bg-white',
+                        !isDone && !isCurrent && 'bg-secondary text-primary/20'
                       )}
                     >
-                      {isDone ? (
-                        <CheckCircle className="h-4 w-4" />
-                      ) : isCurrent ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Icon className="h-4 w-4" />
+                      {isDone && <CheckCircle className="h-3.5 w-3.5" />}
+                      {!isDone && !isCurrent && (
+                        <span className="size-1.5 rounded-full bg-primary/10" />
                       )}
-                    </div>
+                    </span>
                     <span
                       className={cn(
                         'text-sm',
-                        (isDone || isCurrent) ? 'font-medium text-foreground' : 'text-muted-foreground'
+                        (isDone || isCurrent)
+                          ? 'font-semibold text-primary'
+                          : 'font-medium text-muted-foreground'
                       )}
                     >
                       {step.label}
-                    </span>
-                    <span className="ml-auto text-[10px] text-muted-foreground">
-                      {step.event}
                     </span>
                   </div>
                 );
               })}
             </div>
-          </CardContent>
-        </Card>
-      )}
+            <div className="mt-14 border-t border-border pt-5 text-center">
+              <p className="text-[11px] text-muted-foreground">
+                약 5~10초 내외로 분석이 완료됩니다.
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {result && (
         <Card className="border-success/30 bg-success/5">

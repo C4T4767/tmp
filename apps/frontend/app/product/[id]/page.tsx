@@ -1,5 +1,5 @@
 import { ProductDetailScreen } from '@/components/screens/product-detail-screen';
-import { AppShell } from '@/components/app-shell';
+import { BottomNav } from '@/components/bottom-nav';
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -9,8 +9,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
   
   return (
-    <AppShell>
+    <main className="mx-auto min-h-screen max-w-[411px] bg-background">
       <ProductDetailScreen productId={id} />
-    </AppShell>
+      <BottomNav />
+    </main>
   );
 }

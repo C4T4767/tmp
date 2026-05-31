@@ -1,14 +1,25 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import {
   Bell,
   ChevronRight,
   ClipboardList,
   LogOut,
+  Moon,
+  ShieldCheck,
   UserRound,
 } from 'lucide-react';
-import { mockCurrentUser } from '@/lib/mock-data';
+import { useTheme } from 'next-themes';
 import Link from 'next/link';
+import { Switch } from '@/components/ui/switch';
+import { mockCurrentUser } from '@/lib/mock-data';
+import {
+  getNotificationPreference,
+  getPurchaseConfirmationPreference,
+  setNotificationPreference,
+  setPurchaseConfirmationPreference,
+} from '@/lib/preference-storage';
 
 const menuItems = [
   { href: '/onboarding', label: '안전 프로필 수정', icon: ClipboardList },
@@ -16,6 +27,26 @@ const menuItems = [
 
 export function MyPageScreen() {
   const user = mockCurrentUser;
+  const { resolvedTheme, setTheme } = useTheme();
+  const [isMounted, setIsMounted] = useState(false);
+  const [isPurchaseConfirmationEnabled, setIsPurchaseConfirmationEnabled] = useState(true);
+  const [isNotificationEnabled, setIsNotificationEnabled] = useState(true);
+
+  useEffect(() => {
+    setIsPurchaseConfirmationEnabled(getPurchaseConfirmationPreference());
+    setIsNotificationEnabled(getNotificationPreference());
+    setIsMounted(true);
+  }, []);
+
+  const handlePurchaseConfirmationChange = (isEnabled: boolean) => {
+    setIsPurchaseConfirmationEnabled(isEnabled);
+    setPurchaseConfirmationPreference(isEnabled);
+  };
+
+  const handleNotificationChange = (isEnabled: boolean) => {
+    setIsNotificationEnabled(isEnabled);
+    setNotificationPreference(isEnabled);
+  };
 
   return (
     <div className="flex flex-col gap-5 p-4 pb-24">
@@ -44,6 +75,61 @@ export function MyPageScreen() {
 
       <section className="rounded-[18px] bg-white px-4 shadow-[0_8px_24px_rgba(10,37,64,0.05)]">
         <div className="divide-y divide-[#edf2f8]">
+          <div className="flex items-center justify-between gap-3 py-4">
+            <span className="flex min-w-0 items-center gap-3">
+              <ShieldCheck className="h-5 w-5 shrink-0 text-primary/72" strokeWidth={1.75} />
+              <span className="min-w-0">
+                <span className="block text-[0.96rem] font-medium text-primary">구매확인</span>
+                <span className="mt-1 block text-[0.75rem] font-medium text-muted-foreground">
+                  홈에서 구매 여부 확인을 보여줍니다.
+                </span>
+              </span>
+            </span>
+            <Switch
+              checked={isPurchaseConfirmationEnabled}
+              onCheckedChange={handlePurchaseConfirmationChange}
+              aria-label="구매확인 설정"
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-3 py-4">
+            <span className="flex min-w-0 items-center gap-3">
+              <Bell className="h-5 w-5 shrink-0 text-primary/72" strokeWidth={1.75} />
+              <span className="min-w-0">
+                <span className="block text-[0.96rem] font-medium text-primary">알림</span>
+                <span className="mt-1 block text-[0.75rem] font-medium text-muted-foreground">
+                  안전 분석과 관심품목 알림을 받습니다.
+                </span>
+              </span>
+            </span>
+            <Switch
+              checked={isNotificationEnabled}
+              onCheckedChange={handleNotificationChange}
+              aria-label="알림 설정"
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-3 py-4">
+            <span className="flex min-w-0 items-center gap-3">
+              <Moon className="h-5 w-5 shrink-0 text-primary/72" strokeWidth={1.75} />
+              <span className="min-w-0">
+                <span className="block text-[0.96rem] font-medium text-primary">다크모드</span>
+                <span className="mt-1 block text-[0.75rem] font-medium text-muted-foreground">
+                  어두운 화면 톤으로 전환합니다.
+                </span>
+              </span>
+            </span>
+            <Switch
+              checked={isMounted && resolvedTheme === 'dark'}
+              onCheckedChange={(isEnabled) => setTheme(isEnabled ? 'dark' : 'light')}
+              aria-label="다크모드 설정"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-[18px] bg-white px-4 shadow-[0_8px_24px_rgba(10,37,64,0.05)]">
+        <div className="divide-y divide-[#edf2f8]">
           {menuItems.map((item) => (
             <Link
               key={item.href}
@@ -57,17 +143,6 @@ export function MyPageScreen() {
               <ChevronRight className="h-4.5 w-4.5 shrink-0 text-primary/35" strokeWidth={2} />
             </Link>
           ))}
-
-          <button
-            type="button"
-            className="flex w-full items-center justify-between gap-3 py-4 text-left transition-colors active:bg-[#f8fbff]"
-          >
-            <span className="flex items-center gap-3">
-              <Bell className="h-5 w-5 text-primary/72" strokeWidth={1.75} />
-              <span className="text-[0.96rem] font-medium text-primary">알림 설정</span>
-            </span>
-            <ChevronRight className="h-4.5 w-4.5 text-primary/35" strokeWidth={2} />
-          </button>
         </div>
       </section>
 

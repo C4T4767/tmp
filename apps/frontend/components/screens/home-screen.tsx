@@ -5,6 +5,7 @@ import {
   CheckCircle,
   ChevronLeft,
   ChevronRight,
+  Clipboard,
   Link as LinkIcon,
   Package,
   Search,
@@ -30,25 +31,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Switch } from '@/components/ui/switch';
 import {
   type CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,
 } from '@/components/ui/carousel';
+import { SafetyBadge } from '@/components/safety-badge';
 import Link from 'next/link';
 import { mockProducts } from '@/lib/mock-data';
+import { getPurchaseConfirmationPreference } from '@/lib/preference-storage';
+import { cn } from '@/lib/utils';
 
 const supportedShoppingMalls = [
-  { name: '아마존', shortName: 'A', url: 'https://www.amazon.com' },
-  { name: '이베이', shortName: 'E', url: 'https://www.ebay.com' },
-  { name: '아이허브', shortName: 'iH', url: 'https://kr.iherb.com' },
-  { name: '비타트라', shortName: 'V', url: 'https://www.vitatra.com' },
-  { name: '오플닷컴', shortName: 'O', url: 'https://www.ople.com' },
-  { name: '쿠팡', shortName: 'C', url: 'https://www.coupang.com' },
-  { name: '네이버 가격비교', shortName: 'N', url: 'https://search.shopping.naver.com' },
-  { name: '11번가', shortName: '11', url: 'https://www.11st.co.kr' },
+  { name: '네이버 쇼핑', shortName: 'N', url: 'https://search.shopping.naver.com', className: 'bg-[#36c95f]' },
+  { name: '쿠팡', shortName: 'Coupang', url: 'https://www.coupang.com', className: 'bg-[#d73a31]' },
+  { name: '아마존', shortName: 'a', url: 'https://www.amazon.com', className: 'bg-[#c39a66]' },
+  { name: '이베이', shortName: 'ebay', url: 'https://www.ebay.com', className: 'bg-white text-[#4b78d8]' },
+  { name: '아이허브', shortName: 'iHerb', url: 'https://kr.iherb.com', className: 'bg-[#5a8f30]' },
+  { name: '비타트라', shortName: '', url: 'https://www.vitatra.com', className: 'bg-[#58a373]' },
+  { name: '오플닷컴', shortName: '', url: 'https://www.ople.com', className: 'bg-[#f28b2f]' },
 ];
 
 const realtimeSearchKeywords = [
@@ -85,37 +87,9 @@ const mockPurchaseConfirmationChecks = [
   },
 ];
 
-const PURCHASE_CONFIRMATION_COOKIE_NAME = 'safe_buy_purchase_confirmation_enabled';
-const PURCHASE_CONFIRMATION_STORAGE_NAME = 'safe-buy:purchase-confirmation-enabled';
-
-function getPurchaseConfirmationCookie() {
-  if (typeof document === 'undefined') {
-    return true;
-  }
-
-  const cookie = document.cookie
-    .split('; ')
-    .find((value) => value.startsWith(`${PURCHASE_CONFIRMATION_COOKIE_NAME}=`));
-
-  if (cookie) {
-    return cookie.split('=')[1] !== 'false';
-  }
-
-  return window.localStorage.getItem(PURCHASE_CONFIRMATION_STORAGE_NAME) !== 'false';
-}
-
-function setPurchaseConfirmationCookie(isEnabled: boolean) {
-  const expires = new Date();
-  expires.setFullYear(expires.getFullYear() + 1);
-
-  document.cookie = `${PURCHASE_CONFIRMATION_COOKIE_NAME}=${String(
-    isEnabled
-  )}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
-  window.localStorage.setItem(PURCHASE_CONFIRMATION_STORAGE_NAME, String(isEnabled));
-}
-
 export function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [importUrl, setImportUrl] = useState('');
   const [purchaseConfirmationChecks, setPurchaseConfirmationChecks] = useState(
     mockPurchaseConfirmationChecks
   );
@@ -130,7 +104,7 @@ export function HomeScreen() {
     purchaseConfirmationChecks.length > 0;
 
   useEffect(() => {
-    setIsPurchaseConfirmationEnabled(getPurchaseConfirmationCookie());
+    setIsPurchaseConfirmationEnabled(getPurchaseConfirmationPreference());
     setIsPurchasePreferenceLoaded(true);
   }, []);
 
@@ -178,27 +152,17 @@ export function HomeScreen() {
     );
   };
 
-  const handleTogglePurchaseConfirmation = (isEnabled: boolean) => {
-    setIsPurchaseConfirmationEnabled(isEnabled);
-    setPurchaseConfirmationCookie(isEnabled);
+  const handlePasteImportUrl = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setImportUrl(text);
+    } catch {
+      console.log('[v0] Clipboard access denied');
+    }
   };
 
   return (
     <div className="flex flex-col gap-6 p-4 pb-24">
-      <div className="fixed left-3 top-3 z-[60] flex items-center gap-2 rounded-full border border-border bg-background/95 px-3 py-2 text-xs font-medium text-foreground shadow-sm backdrop-blur">
-        <span>구매확인</span>
-        <Switch
-          checked={isPurchaseConfirmationEnabled}
-          onCheckedChange={handleTogglePurchaseConfirmation}
-          aria-label="구매확인 알림"
-        />
-        {purchaseConfirmationChecks.length > 0 && (
-          <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
-            {purchaseConfirmationChecks.length}
-          </span>
-        )}
-      </div>
-
       {/* Header */}
       <div className="text-center">
         <h1 className="text-2xl font-bold text-primary">SafeBuy</h1>
@@ -334,72 +298,90 @@ export function HomeScreen() {
                 링크로 가져오기
               </Button>
             </DrawerTrigger>
-            <DrawerContent className="mx-auto max-w-md rounded-t-3xl">
-              <DrawerHeader className="px-5 text-left">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <DrawerTitle className="text-lg">상품 링크 가져오기</DrawerTitle>
-                    <DrawerDescription>
-                      지원 쇼핑몰에서 상품 링크를 복사한 뒤 분석할 수 있습니다.
-                    </DrawerDescription>
-                  </div>
+            <DrawerContent className="mx-auto max-w-[411px] rounded-t-xl bg-[#f7f8ff] px-3 pb-10 pt-2">
+              <DrawerHeader className="px-1 pb-3 text-left">
+                <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-muted-foreground/25" />
+                <div className="flex items-center justify-between">
+                  <DrawerTitle className="text-sm font-semibold text-primary">
+                    링크로 상품 가져오기
+                  </DrawerTitle>
                   <DrawerClose asChild>
                     <button
                       type="button"
-                      className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      className="inline-flex size-7 items-center justify-center rounded-full text-primary/70 active:bg-muted"
                       aria-label="닫기"
                     >
-                      <X className="h-5 w-5" />
+                      <X className="h-3.5 w-3.5" />
                     </button>
                   </DrawerClose>
                 </div>
+                <DrawerDescription className="sr-only">
+                  상품 URL을 입력하거나 쇼핑몰을 선택할 수 있습니다.
+                </DrawerDescription>
               </DrawerHeader>
 
-              <div className="flex flex-col gap-6 px-5 pb-8">
-                <DrawerClose asChild>
-                  <Link
-                    href="/import"
-                    className="flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+              <div className="flex flex-col gap-5">
+                <div className="flex h-9 items-center gap-2 rounded-md border border-border bg-white px-2">
+                  <Input
+                    type="url"
+                    placeholder="상품 URL을 입력하세요"
+                    value={importUrl}
+                    onChange={(event) => setImportUrl(event.target.value)}
+                    className="h-7 border-0 bg-transparent px-1 text-[11px] shadow-none focus-visible:ring-0"
+                  />
+                  <button
+                    type="button"
+                    onClick={handlePasteImportUrl}
+                    className="inline-flex h-6 shrink-0 items-center gap-1 rounded bg-secondary px-2 text-[10px] font-semibold text-primary"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <LinkIcon className="h-5 w-5" />
-                      </span>
-                      <div>
-                        <p className="font-semibold text-foreground">링크로 상품 추가</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          복사한 상품 URL을 붙여넣기
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                  </Link>
-                </DrawerClose>
-
-                <div>
-                  <div className="mb-3 flex items-center gap-2">
-                    <ShoppingBag className="h-4 w-4 text-primary" />
-                    <h3 className="text-sm font-semibold text-foreground">
-                      지원 쇼핑몰 바로가기
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {supportedShoppingMalls.map((mall) => (
-                      <a
-                        key={mall.name}
-                        href={mall.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex min-h-12 items-center gap-2 rounded-full bg-muted px-3 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
-                      >
-                        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
-                          {mall.shortName}
-                        </span>
-                        <span className="truncate">{mall.name}</span>
-                      </a>
-                    ))}
-                  </div>
+                    <Clipboard className="h-3 w-3" />
+                    붙여넣기
+                  </button>
                 </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="h-px flex-1 bg-border" />
+                  <p className="text-[10px] text-muted-foreground">또는 쇼핑몰을 선택해 주세요</p>
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+
+                <div className="grid grid-cols-3 gap-x-6 gap-y-5 px-3">
+                  {supportedShoppingMalls.map((mall) => (
+                    <a
+                      key={mall.name}
+                      href={mall.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-col items-center gap-2 text-center"
+                    >
+                      <span
+                        className={cn(
+                          'flex size-12 items-center justify-center rounded-lg text-xs font-black text-white shadow-sm',
+                          mall.className
+                        )}
+                      >
+                        {mall.shortName || (
+                          <ShoppingBag className="h-6 w-6 text-white" strokeWidth={2.1} />
+                        )}
+                      </span>
+                      <span className="text-[10px] font-medium text-primary">{mall.name}</span>
+                    </a>
+                  ))}
+                  <DrawerClose asChild>
+                    <Link href="/import" className="flex flex-col items-center gap-2 text-center">
+                      <span className="flex size-12 items-center justify-center rounded-lg bg-primary text-white shadow-sm">
+                        <LinkIcon className="h-6 w-6" />
+                      </span>
+                      <span className="text-[10px] font-medium text-primary">직접 분석</span>
+                    </Link>
+                  </DrawerClose>
+                </div>
+
+                <Button asChild className="mx-3 mt-1 h-10">
+                  <Link href="/import">
+                    분석 화면으로 이동
+                  </Link>
+                </Button>
               </div>
             </DrawerContent>
           </Drawer>
@@ -425,13 +407,27 @@ export function HomeScreen() {
                 <span className="w-5 text-center text-sm font-bold text-primary">
                   {index + 1}
                 </span>
-                <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md border border-border bg-muted">
-                  <Package className="h-6 w-6 text-muted-foreground" />
+                <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
+                  {product?.imageUrl ? (
+                    <img
+                      src={product.imageUrl}
+                      alt={`${product.name} 상품 이미지`}
+                      className="h-full w-full object-contain p-1.5"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <Package className="h-6 w-6 text-muted-foreground" />
+                  )}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-foreground">
+                  <span className="block truncate text-sm font-semibold text-foreground">
                     {item.name}
                   </span>
+                  {product?.variantLabel && (
+                    <span className="mt-0.5 block truncate text-[11px] text-muted-foreground">
+                      {product.variantLabel}
+                    </span>
+                  )}
                   {product && product.purposeTags.length > 0 && (
                     <div className="mt-1 flex flex-wrap gap-1">
                       {product.purposeTags.slice(0, 2).map((tag) => (
@@ -445,6 +441,17 @@ export function HomeScreen() {
                     </div>
                   )}
                 </div>
+                {product && (
+                  <div className="flex flex-shrink-0 flex-col items-end gap-1">
+                    <SafetyBadge
+                      status={product.status}
+                      className="rounded-md px-1.5 py-0 text-[10px]"
+                    />
+                    <span className="text-xs font-bold text-primary">
+                      {product.price.toLocaleString()}원
+                    </span>
+                  </div>
+                )}
               </Link>
             );
           })}
