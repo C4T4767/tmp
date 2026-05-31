@@ -316,7 +316,7 @@ export const mockGroupMembers: GroupMember[] = [
 
 export const mockCurrentUser = {
   id: '1',
-  nickname: '홍길동',
+  nickname: '김싸피',
   isOnboarded: true,
   onboardingInfo: {
     isPregnant: false,
