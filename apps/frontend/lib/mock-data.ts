@@ -5,6 +5,8 @@ export const mockProducts: Product[] = [
     id: '1',
     name: 'Nature Made 멀티비타민',
     price: 25900,
+    imageUrl: '/product-images/nature-made-multivitamin.png',
+    variantLabel: '130정 · 비타민 D 25mcg',
     status: 'user-risk',
     purposeTags: ['종합 영양', '면역'],
     ingredients: [
@@ -18,6 +20,8 @@ export const mockProducts: Product[] = [
     id: '2',
     name: 'NOW Foods 오메가-3',
     price: 32500,
+    imageUrl: '/product-images/now-omega-3.jpg',
+    variantLabel: 'EPA 180mg · DHA 120mg',
     status: 'caution',
     purposeTags: ['혈행', '눈 건강'],
     ingredients: [
@@ -30,6 +34,8 @@ export const mockProducts: Product[] = [
     id: '3',
     name: 'Swanson 프로바이오틱스',
     price: 28000,
+    imageUrl: '/product-images/swanson-probiotic.jpg',
+    variantLabel: '10 Billion CFU · 30캡슐',
     status: 'blocked',
     purposeTags: ['장 건강', '체중 관리'],
     ingredients: [
@@ -42,6 +48,8 @@ export const mockProducts: Product[] = [
     id: '4',
     name: 'California Gold 비타민 C',
     price: 18500,
+    imageUrl: '/product-images/california-gold-vitamin-c.jpg',
+    variantLabel: '비타민 C 1000mg · 60캡슐',
     status: 'user-risk',
     purposeTags: ['면역', '항산화'],
     ingredients: [
@@ -53,6 +61,8 @@ export const mockProducts: Product[] = [
     id: '5',
     name: 'Garden of Life 프로틴',
     price: 45000,
+    imageUrl: '/product-images/garden-of-life-protein.jpg',
+    variantLabel: '단백질 22g · 20회분',
     status: 'group-caution',
     purposeTags: ['단백질 보충', '장 건강'],
     ingredients: [
