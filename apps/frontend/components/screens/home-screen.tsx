@@ -9,7 +9,6 @@ import {
   Link as LinkIcon,
   Package,
   Search,
-  ShoppingBag,
   X,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -41,16 +40,15 @@ import { SafetyBadge } from '@/components/safety-badge';
 import Link from 'next/link';
 import { mockProducts } from '@/lib/mock-data';
 import { getPurchaseConfirmationPreference } from '@/lib/preference-storage';
-import { cn } from '@/lib/utils';
 
 const supportedShoppingMalls = [
-  { name: '네이버 쇼핑', shortName: 'N', url: 'https://search.shopping.naver.com', className: 'bg-[#36c95f]' },
-  { name: '쿠팡', shortName: 'Coupang', url: 'https://www.coupang.com', className: 'bg-[#d73a31]' },
-  { name: '아마존', shortName: 'a', url: 'https://www.amazon.com', className: 'bg-[#c39a66]' },
-  { name: '이베이', shortName: 'ebay', url: 'https://www.ebay.com', className: 'bg-white text-[#4b78d8]' },
-  { name: '아이허브', shortName: 'iHerb', url: 'https://kr.iherb.com', className: 'bg-[#5a8f30]' },
-  { name: '비타트라', shortName: '', url: 'https://www.vitatra.com', className: 'bg-[#58a373]' },
-  { name: '오플닷컴', shortName: '', url: 'https://www.ople.com', className: 'bg-[#f28b2f]' },
+  { id: 'naver', name: '네이버', url: 'https://search.shopping.naver.com' },
+  { id: 'coupang', name: '쿠팡', url: 'https://www.coupang.com' },
+  { id: 'amazon', name: '아마존', url: 'https://www.amazon.com' },
+  { id: 'ebay', name: '이베이', url: 'https://www.ebay.com' },
+  { id: 'iherb', name: '아이허브', url: 'https://kr.iherb.com' },
+  { id: 'vitatra', name: '비타트라', url: 'https://www.vitatra.com' },
+  { id: 'ople', name: '오플닷컴', url: 'https://www.ople.com' },
 ];
 
 const realtimeSearchKeywords = [
@@ -86,6 +84,83 @@ const mockPurchaseConfirmationChecks = [
     totalPrice: 37500,
   },
 ];
+
+function ShoppingMallIcon({ mallId }: { mallId: string }) {
+  if (mallId === 'naver') {
+    return (
+      <span className="flex size-12 items-center justify-center rounded-[14px] border border-black/15 bg-[#5ec63a] text-[1.75rem] font-black leading-none text-white shadow-sm">
+        N
+      </span>
+    );
+  }
+
+  if (mallId === 'coupang') {
+    return (
+      <span className="flex size-12 items-center justify-center rounded-[14px] bg-white shadow-sm">
+        <span
+          className="flex size-8 items-center justify-center bg-[#d83b2e] text-[9px] font-bold text-white"
+          style={{
+            clipPath:
+              'polygon(50% 0%,58% 12%,70% 5%,75% 19%,89% 16%,86% 31%,100% 39%,88% 50%,100% 61%,86% 69%,89% 84%,75% 81%,70% 95%,58% 88%,50% 100%,42% 88%,30% 95%,25% 81%,11% 84%,14% 69%,0% 61%,12% 50%,0% 39%,14% 31%,11% 16%,25% 19%,30% 5%,42% 12%)',
+          }}
+        >
+          coupang
+        </span>
+      </span>
+    );
+  }
+
+  if (mallId === 'amazon') {
+    return (
+      <span className="relative flex size-12 items-center justify-center overflow-hidden rounded-[14px] bg-[#c2a16d] shadow-sm">
+        <span className="absolute left-[1.55rem] top-0 h-4 w-4 rounded-b-[3px] bg-[#72b9ee]" />
+        <span className="absolute left-[2.05rem] top-0 h-3 w-3 rounded-bl-[3px] bg-[#8fd0ff]" />
+        <span className="absolute bottom-4 h-4 w-8 rounded-b-full border-b-[3px] border-[#1f1d1b]" />
+        <span className="absolute bottom-[1.05rem] right-3 h-1.5 w-2.5 rounded-full border-t-[3px] border-[#1f1d1b]" />
+      </span>
+    );
+  }
+
+  if (mallId === 'ebay') {
+    return (
+      <span className="flex size-12 items-center justify-center rounded-[14px] bg-white text-[1.05rem] font-semibold shadow-sm">
+        <span className="text-[#e53238]">e</span>
+        <span className="text-[#0064d2]">b</span>
+        <span className="text-[#f5af02]">a</span>
+        <span className="text-[#86b817]">y</span>
+      </span>
+    );
+  }
+
+  if (mallId === 'iherb') {
+    return (
+      <span className="flex size-12 items-center justify-center rounded-[14px] bg-[#5b8425] text-[1.05rem] font-bold text-white shadow-sm">
+        iHerb
+      </span>
+    );
+  }
+
+  if (mallId === 'vitatra') {
+    return (
+      <span className="relative flex size-12 items-center justify-center rounded-[14px] bg-[#5aa372] shadow-sm">
+        <span className="absolute size-8 rounded-full border-2 border-white/90" />
+        <span className="absolute size-9 rounded-full border border-white/70" />
+        <span className="absolute size-10 rotate-[-18deg] rounded-full border border-white/70" />
+        <span className="size-5 rounded-full bg-white" />
+        <span className="absolute bottom-2 h-4 border-l-2 border-white/90" />
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative flex size-12 items-center justify-center rounded-[14px] bg-white shadow-sm">
+      <span className="absolute size-8 rounded-full border-[3px] border-[#df7330]" />
+      <span className="absolute h-8 border-l-[3px] border-[#df7330]" />
+      <span className="absolute h-7 w-4 -translate-x-1.5 rotate-[-28deg] rounded-l-full border-l-[3px] border-t-[3px] border-[#df7330]" />
+      <span className="absolute h-7 w-4 translate-x-1.5 rotate-[28deg] rounded-r-full border-r-[3px] border-t-[3px] border-[#df7330]" />
+    </span>
+  );
+}
 
 export function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -165,8 +240,7 @@ export function HomeScreen() {
     <div className="flex flex-col gap-6 p-4 pb-24">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-primary">SafeBuy</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           해외직구 상품, 구매 전에 성분 안전성을 확인하세요.
         </p>
       </div>
@@ -339,6 +413,12 @@ export function HomeScreen() {
                   </button>
                 </div>
 
+                <Button asChild className="mx-3 h-10">
+                  <Link href="/import">
+                    링크로 분석하기
+                  </Link>
+                </Button>
+
                 <div className="flex items-center gap-3">
                   <span className="h-px flex-1 bg-border" />
                   <p className="text-[10px] text-muted-foreground">또는 쇼핑몰을 선택해 주세요</p>
@@ -348,40 +428,20 @@ export function HomeScreen() {
                 <div className="grid grid-cols-3 gap-x-6 gap-y-5 px-3">
                   {supportedShoppingMalls.map((mall) => (
                     <a
-                      key={mall.name}
+                      key={mall.id}
                       href={mall.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-2 text-center"
+                      className="flex flex-col items-center gap-1.5 text-center"
                     >
-                      <span
-                        className={cn(
-                          'flex size-12 items-center justify-center rounded-lg text-xs font-black text-white shadow-sm',
-                          mall.className
-                        )}
-                      >
-                        {mall.shortName || (
-                          <ShoppingBag className="h-6 w-6 text-white" strokeWidth={2.1} />
-                        )}
+                      <span className="flex items-center gap-1 text-[10px] font-semibold text-[#9b7bd4]">
+                        <span className="text-[0.8rem] leading-none">❖</span>
+                        {mall.name}
                       </span>
-                      <span className="text-[10px] font-medium text-primary">{mall.name}</span>
+                      <ShoppingMallIcon mallId={mall.id} />
                     </a>
                   ))}
-                  <DrawerClose asChild>
-                    <Link href="/import" className="flex flex-col items-center gap-2 text-center">
-                      <span className="flex size-12 items-center justify-center rounded-lg bg-primary text-white shadow-sm">
-                        <LinkIcon className="h-6 w-6" />
-                      </span>
-                      <span className="text-[10px] font-medium text-primary">직접 분석</span>
-                    </Link>
-                  </DrawerClose>
                 </div>
-
-                <Button asChild className="mx-3 mt-1 h-10">
-                  <Link href="/import">
-                    분석 화면으로 이동
-                  </Link>
-                </Button>
               </div>
             </DrawerContent>
           </Drawer>

@@ -191,8 +191,17 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
         href={`/product/${recommendedProduct.id}`}
         className="flex gap-3 rounded-lg border border-border bg-card p-3 active:bg-muted"
       >
-        <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-md bg-muted">
-          <Package className="h-6 w-6 text-muted-foreground" />
+        <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
+          {recommendedProduct.imageUrl ? (
+            <img
+              src={recommendedProduct.imageUrl}
+              alt={`${recommendedProduct.name} 상품 이미지`}
+              className="h-full w-full object-contain p-1.5"
+              loading="lazy"
+            />
+          ) : (
+            <Package className="h-6 w-6 text-muted-foreground" />
+          )}
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-start justify-between gap-2">

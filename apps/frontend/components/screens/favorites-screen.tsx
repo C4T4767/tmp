@@ -186,6 +186,32 @@ export function FavoritesScreen() {
   const [pendingPurchase, setPendingPurchase] = useState<PendingPurchase | null>(null);
   const [purchaseRecords, setPurchaseRecords] = useState<PurchaseRecord[]>([
     {
+      id: 'purchase-personal-1',
+      groupId: PERSONAL_COLLECTION_ID,
+      buyerName: '김싸피',
+      product: mockProducts[0],
+      priceInfo: {
+        store: 'iHerb',
+        price: 25900,
+        shipping: 4500,
+        url: 'https://iherb.com',
+      },
+      purchasedAt: '2026-05-31T00:00:00+09:00',
+    },
+    {
+      id: 'purchase-personal-2',
+      groupId: PERSONAL_COLLECTION_ID,
+      buyerName: '김싸피',
+      product: mockProducts[3],
+      priceInfo: {
+        store: 'Amazon',
+        price: 19900,
+        shipping: 5000,
+        url: 'https://amazon.com',
+      },
+      purchasedAt: '2026-05-29T00:00:00+09:00',
+    },
+    {
       id: 'purchase-1',
       groupId: '1',
       buyerName: '김영희',
@@ -236,6 +262,32 @@ export function FavoritesScreen() {
         url: 'https://amazon.com',
       },
       purchasedAt: '2026-05-19T00:00:00+09:00',
+    },
+    {
+      id: 'purchase-5',
+      groupId: '2',
+      buyerName: '김철수',
+      product: mockProducts[1],
+      priceInfo: {
+        store: 'Amazon',
+        price: 32500,
+        shipping: 5000,
+        url: 'https://amazon.com',
+      },
+      purchasedAt: '2026-05-27T00:00:00+09:00',
+    },
+    {
+      id: 'purchase-6',
+      groupId: '2',
+      buyerName: '박지민',
+      product: mockProducts[4],
+      priceInfo: {
+        store: 'Vitacost',
+        price: 43800,
+        shipping: 6000,
+        url: 'https://vitacost.com',
+      },
+      purchasedAt: '2026-05-22T00:00:00+09:00',
     },
   ]);
   const [searchQuery, setSearchQuery] = useState('');

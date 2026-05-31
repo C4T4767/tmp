@@ -1,6 +1,6 @@
-const PURCHASE_CONFIRMATION_COOKIE_NAME = 'safe_buy_purchase_confirmation_enabled';
-const PURCHASE_CONFIRMATION_STORAGE_NAME = 'safe-buy:purchase-confirmation-enabled';
-const NOTIFICATION_STORAGE_NAME = 'safe-buy:notification-enabled';
+const PURCHASE_CONFIRMATION_COOKIE_NAME = 'jikgubom_purchase_confirmation_enabled';
+const PURCHASE_CONFIRMATION_STORAGE_NAME = 'jikgubom:purchase-confirmation-enabled';
+const NOTIFICATION_STORAGE_NAME = 'jikgubom:notification-enabled';
 
 function canUseBrowserStorage() {
   return typeof window !== 'undefined';

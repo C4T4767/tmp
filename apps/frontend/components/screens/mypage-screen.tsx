@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import {
   Bell,
+  CheckCircle,
   ChevronRight,
   ClipboardList,
   LogOut,
   Moon,
-  ShieldCheck,
   UserRound,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -77,7 +77,7 @@ export function MyPageScreen() {
         <div className="divide-y divide-[#edf2f8]">
           <div className="flex items-center justify-between gap-3 py-4">
             <span className="flex min-w-0 items-center gap-3">
-              <ShieldCheck className="h-5 w-5 shrink-0 text-primary/72" strokeWidth={1.75} />
+              <CheckCircle className="h-5 w-5 shrink-0 text-primary/72" strokeWidth={1.75} />
               <span className="min-w-0">
                 <span className="block text-[0.96rem] font-medium text-primary">구매확인</span>
                 <span className="mt-1 block text-[0.75rem] font-medium text-muted-foreground">

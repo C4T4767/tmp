@@ -1,6 +1,6 @@
 import type { ProductOffer } from './types';
 
-export const FAVORITE_OFFERS_STORAGE_KEY = 'safe-buy.favorite-offers';
+export const FAVORITE_OFFERS_STORAGE_KEY = 'jikgubom.favorite-offers';
 
 export interface FavoriteOffer {
   productId: string;

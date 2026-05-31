@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'SafeBuy - 해외직구 성분 안전 확인',
+  title: '직구봄 - 해외직구 성분 안전 확인',
   description: '해외직구 건강식품·영양제 성분을 분석하고 안전성을 확인하세요.',
   generator: 'v0.app',
   icons: {
