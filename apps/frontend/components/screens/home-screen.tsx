@@ -38,6 +38,7 @@ import {
   CarouselItem,
 } from '@/components/ui/carousel';
 import Link from 'next/link';
+import { mockProducts } from '@/lib/mock-data';
 
 const supportedShoppingMalls = [
   { name: '아마존', shortName: 'A', url: 'https://www.amazon.com' },
@@ -412,21 +413,41 @@ export function HomeScreen() {
           <span className="text-xs text-muted-foreground">방금 업데이트</span>
         </div>
         <div className="rounded-lg border border-border bg-card">
-          {realtimeSearchKeywords.map((item, index) => (
-            <Link
-              key={`${item.productId}-${item.name}`}
-              href={`/product/${item.productId}`}
-              className="flex items-center gap-3 border-b border-border px-4 py-3 transition-colors last:border-b-0 hover:bg-muted/50"
-            >
-              <span className="w-5 text-center text-sm font-bold text-primary">
-                {index + 1}
-              </span>
-              <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md border border-border bg-muted">
-                <Package className="h-6 w-6 text-muted-foreground" />
-              </span>
-              <span className="flex-1 text-sm font-medium text-foreground">{item.name}</span>
-            </Link>
-          ))}
+          {realtimeSearchKeywords.map((item, index) => {
+            const product = mockProducts.find((mockProduct) => mockProduct.id === item.productId);
+
+            return (
+              <Link
+                key={`${item.productId}-${item.name}`}
+                href={`/product/${item.productId}`}
+                className="flex items-center gap-3 border-b border-border px-4 py-3 transition-colors last:border-b-0 hover:bg-muted/50"
+              >
+                <span className="w-5 text-center text-sm font-bold text-primary">
+                  {index + 1}
+                </span>
+                <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-md border border-border bg-muted">
+                  <Package className="h-6 w-6 text-muted-foreground" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium text-foreground">
+                    {item.name}
+                  </span>
+                  {product && product.purposeTags.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {product.purposeTags.slice(0, 2).map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[10px] font-medium text-primary"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

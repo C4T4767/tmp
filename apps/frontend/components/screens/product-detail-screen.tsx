@@ -11,6 +11,7 @@ import {
   Users,
   ShoppingBag,
   MessageSquareText,
+  Package,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,6 +25,11 @@ import {
   removeFavoriteOffer,
   saveFavoriteOffer,
 } from '@/lib/favorite-storage';
+import {
+  getAlternativeProducts,
+  getGeneralRecommendationSections,
+  type RecommendedProduct,
+} from '@/lib/product-recommendations';
 
 interface ProductDetailScreenProps {
   productId: string;
@@ -80,6 +86,8 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
   const priceInfos = mockProductOffers
     .filter((offer) => offer.productId === product.id)
     .sort((a, b) => a.rank - b.rank);
+  const alternativeProducts = getAlternativeProducts(product.id);
+  const recommendationSections = getGeneralRecommendationSections(product.id);
   const selectedGroup = mockGroups.find((g) => g.id === selectedGroupId);
   const groupRiskReason = mockGroupIngredientRiskReasons[selectedGroupId]?.[product.id];
   
@@ -138,6 +146,55 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
     );
   };
 
+  const renderRecommendedProduct = ({
+    product: recommendedProduct,
+    bestOffer,
+    reason,
+  }: RecommendedProduct) => {
+    const totalPrice = bestOffer
+      ? bestOffer.price + bestOffer.shipping
+      : recommendedProduct.price;
+
+    return (
+      <Link
+        key={recommendedProduct.id}
+        href={`/product/${recommendedProduct.id}`}
+        className="flex gap-3 rounded-lg border border-border bg-background p-3 transition-colors hover:bg-muted/40"
+      >
+        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-md bg-muted">
+          <Package className="h-6 w-6 text-muted-foreground" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <p className="line-clamp-2 text-sm font-semibold text-foreground">
+              {recommendedProduct.name}
+            </p>
+            <SafetyBadge
+              status={recommendedProduct.status}
+              className="flex-shrink-0"
+            />
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1">
+            {recommendedProduct.purposeTags.slice(0, 2).map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[11px] font-medium text-primary"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <span>{reason}</span>
+            <span className="font-semibold text-primary">
+              배송비 포함 {totalPrice.toLocaleString()}원
+            </span>
+          </div>
+        </div>
+      </Link>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4 pb-24">
       {/* Header */}
@@ -153,6 +210,18 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
       {/* Product Name */}
       <div>
         <h1 className="text-xl font-bold text-foreground">{product.name}</h1>
+        {product.purposeTags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {product.purposeTags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-primary/15 bg-primary/5 px-2.5 py-1 text-xs font-semibold text-primary"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Add to Favorites */}
@@ -349,6 +418,39 @@ export function ProductDetailScreen({ productId }: ProductDetailScreenProps) {
                   {groupRiskReason.reason}
                 </p>
               )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {hasBlockedIngredient && alternativeProducts.length > 0 && (
+        <Card className={cn(hasBlockedIngredient && 'border-primary/25 bg-primary/5')}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">대체로 확인해볼 상품</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-3">
+              {alternativeProducts.map(renderRecommendedProduct)}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {!hasBlockedIngredient && recommendationSections.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">이런 상품은 어떤가요</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-5">
+              {recommendationSections.map((section) => (
+                <div key={section.title} className="flex flex-col gap-3">
+                  <h3 className="text-sm font-semibold text-foreground">{section.title}</h3>
+                  <div className="flex flex-col gap-3">
+                    {section.items.map(renderRecommendedProduct)}
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
