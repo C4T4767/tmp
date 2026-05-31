@@ -35,13 +35,15 @@ export function BottomNav() {
               aria-current={isActive ? 'page' : undefined}
               title={item.label}
             >
-              <item.icon
-                className={cn(
-                  'h-7 w-7 transition-colors',
-                  isActive ? 'fill-secondary stroke-primary' : 'fill-transparent stroke-current'
+              <span className="relative flex h-7 w-7 items-center justify-center">
+                {isActive && (
+                  <span className="absolute inset-[3px] rounded-full bg-secondary" aria-hidden="true" />
                 )}
-                strokeWidth={isActive ? 2.05 : 1.8}
-              />
+                <item.icon
+                  className="relative h-7 w-7 fill-transparent stroke-current transition-colors"
+                  strokeWidth={isActive ? 2.05 : 1.8}
+                />
+              </span>
               <span>{item.label}</span>
             </Link>
           );
