@@ -9,11 +9,11 @@ import {
   Link as LinkIcon,
   Package,
   Search,
+  TrendingUp,
   X,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Drawer,
   DrawerClose,
@@ -40,6 +40,7 @@ import { SafetyBadge } from '@/components/safety-badge';
 import Link from 'next/link';
 import { mockProducts } from '@/lib/mock-data';
 import { getPurchaseConfirmationPreference } from '@/lib/preference-storage';
+import { cn } from '@/lib/utils';
 
 const supportedShoppingMalls = [
   { id: 'naver', name: '네이버', url: 'https://search.shopping.naver.com' },
@@ -63,6 +64,16 @@ const realtimeSearchKeywords = [
   { productId: '5', name: 'Garden of Life 콜라겐' },
   { productId: '3', name: 'Swanson 루테인' },
 ];
+
+const realtimeTrendDeltas = [12, 9, 7, 6, 5, 5, 4, 3, 3, 2];
+
+const rankingSafetyStyle = {
+  safe: 'bg-[#e8f8ef] text-[#12814d]',
+  caution: 'bg-[#f4f7fb] text-primary/68',
+  blocked: 'bg-[#fff1ef] text-[#b42318]',
+  'user-risk': 'bg-[#fff8ec] text-primary/72',
+  'group-caution': 'bg-[#fff8ec] text-primary/72',
+};
 
 const mockPurchaseConfirmationChecks = [
   {
@@ -237,27 +248,32 @@ export function HomeScreen() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-4 pb-24">
+    <div className="flex flex-col gap-5 p-4 pb-24">
       {/* Header */}
-      <div className="text-center">
-        <p className="text-sm text-muted-foreground">
-          해외직구 상품, 구매 전에 성분 안전성을 확인하세요.
+      <div className="pt-1">
+        <p className="text-[0.84rem] font-medium leading-5 text-primary/62">
+          구매 전 성분과 가격을 한 번에 확인하세요.
         </p>
       </div>
 
       {/* Search */}
-      <form onSubmit={handleSearch} className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <form
+        onSubmit={handleSearch}
+        className="flex items-center gap-2 rounded-[18px] bg-white p-1.5 shadow-[0_10px_28px_rgba(10,37,64,0.07)]"
+      >
+        <div className="relative min-w-0 flex-1">
+          <Search className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-primary/45" />
           <Input
             type="text"
-            placeholder="상품명을 입력하세요"
+            placeholder="상품명으로 검색"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="h-11 rounded-[14px] border-0 bg-[#f7faff] pl-10 text-[0.92rem] font-medium shadow-none placeholder:text-primary/38 focus-visible:ring-1 focus-visible:ring-[#38bdf8]/60"
           />
         </div>
-        <Button type="submit">검색</Button>
+        <Button type="submit" className="h-11 rounded-[14px] px-5 text-[0.9rem] font-semibold">
+          검색
+        </Button>
       </form>
 
       {shouldShowPurchaseDialog && (
@@ -355,22 +371,25 @@ export function HomeScreen() {
       )}
 
       {/* Link Analysis Card */}
-      <Card className="border-primary/20 bg-primary/5">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <LinkIcon className="h-5 w-5 text-primary" />
-            링크로 분석하기
-          </CardTitle>
-          <CardDescription>
-            해외 쇼핑몰 상품 URL을 붙여넣어 성분을 분석할 수 있습니다.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
+      <section className="rounded-[20px] border border-[#d8e4f2] bg-white px-4 py-3.5 shadow-[0_10px_28px_rgba(10,37,64,0.05)]">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-[0.96rem] font-semibold text-primary">
+              <LinkIcon className="h-4.5 w-4.5" strokeWidth={2} />
+              링크로 분석하기
+            </div>
+            <p className="mt-1 line-clamp-2 text-[0.78rem] font-medium leading-5 text-primary/58">
+              상품 URL로 성분과 가격 정보를 확인해요.
+            </p>
+          </div>
           <Drawer>
             <DrawerTrigger asChild>
-              <Button variant="default" className="w-full">
-                링크로 가져오기
-              </Button>
+              <button
+                type="button"
+                className="inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-primary px-4 text-[0.82rem] font-semibold text-white shadow-[0_8px_18px_rgba(10,37,64,0.18)] active:scale-[0.98]"
+              >
+                가져오기
+              </button>
             </DrawerTrigger>
             <DrawerContent className="mx-auto max-w-[411px] rounded-t-xl bg-[#f7f8ff] px-3 pb-10 pt-2">
               <DrawerHeader className="px-1 pb-3 text-left">
@@ -445,35 +464,44 @@ export function HomeScreen() {
               </div>
             </DrawerContent>
           </Drawer>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {/* Realtime Search Keywords */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">실시간 검색 TOP 10</h2>
-          <span className="text-xs text-muted-foreground">방금 업데이트</span>
+          <div className="flex items-center gap-2">
+            <h2 className="text-[1.08rem] font-semibold text-primary">실시간 검색 TOP 10</h2>
+            <span className="inline-flex h-6 items-center gap-1 rounded-full bg-[#e0f2fe] px-2 text-[0.68rem] font-semibold text-primary">
+              <TrendingUp className="h-3.5 w-3.5" strokeWidth={2} />
+              상승
+            </span>
+          </div>
+          <span className="text-[0.72rem] font-medium text-primary/46">방금 업데이트</span>
         </div>
-        <div className="rounded-lg border border-border bg-card">
+        <div className="overflow-hidden rounded-[22px] bg-white shadow-[0_12px_30px_rgba(10,37,64,0.07)]">
           {realtimeSearchKeywords.map((item, index) => {
             const product = mockProducts.find((mockProduct) => mockProduct.id === item.productId);
+            const trendDelta = realtimeTrendDeltas[index] ?? 1;
+            const rankingSafetyClass = product ? rankingSafetyStyle[product.status] : undefined;
 
             return (
               <Link
                 key={`${item.productId}-${item.name}`}
                 href={`/product/${item.productId}`}
-                className="flex items-center gap-3 border-b border-border px-4 py-3 transition-colors last:border-b-0 hover:bg-muted/50"
+                className="flex items-center gap-3 border-b border-[#e5edf7] px-4 py-3 transition-colors last:border-b-0 active:bg-[#f8fbff]"
               >
-                <span className="w-5 text-center text-sm font-bold text-primary">
+                <span className="w-5 text-center text-[0.92rem] font-semibold text-primary/86">
                   {index + 1}
                 </span>
-                <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
+                <span className="flex h-[3.65rem] w-[3.65rem] flex-shrink-0 items-center justify-center overflow-hidden rounded-[16px] border border-[#d8e4f2] bg-[#f8fbff]">
                   {product?.imageUrl ? (
                     <img
                       src={product.imageUrl}
                       alt={`${product.name} 상품 이미지`}
-                      className="h-full w-full object-contain p-1.5"
+                      className="h-full w-full object-contain p-2"
                       loading="lazy"
+                      referrerPolicy="no-referrer"
                     />
                   ) : (
                     <Package className="h-6 w-6 text-muted-foreground" />
@@ -484,7 +512,7 @@ export function HomeScreen() {
                     {item.name}
                   </span>
                   {product?.variantLabel && (
-                    <span className="mt-0.5 block truncate text-[11px] text-muted-foreground">
+                    <span className="mt-0.5 block truncate text-[0.74rem] font-medium text-primary/55">
                       {product.variantLabel}
                     </span>
                   )}
@@ -493,7 +521,7 @@ export function HomeScreen() {
                       {product.purposeTags.slice(0, 2).map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[10px] font-medium text-primary"
+                          className="rounded-full bg-[#f4f7fb] px-2 py-0.5 text-[0.64rem] font-medium text-primary/64"
                         >
                           {tag}
                         </span>
@@ -502,12 +530,34 @@ export function HomeScreen() {
                   )}
                 </div>
                 {product && (
-                  <div className="flex flex-shrink-0 flex-col items-end gap-1">
+                  <div className="flex flex-shrink-0 flex-col items-end gap-1.5">
                     <SafetyBadge
                       status={product.status}
-                      className="rounded-md px-1.5 py-0 text-[10px]"
+                      className={cn(
+                        'rounded-full px-2 py-0.5 text-[0.64rem] font-medium',
+                        rankingSafetyClass
+                      )}
                     />
-                    <span className="text-xs font-bold text-primary">
+                    <span className="flex items-center gap-1 text-[0.68rem] font-semibold text-[#12814d]">
+                      <svg
+                        width="34"
+                        height="14"
+                        viewBox="0 0 34 14"
+                        aria-hidden="true"
+                        className="text-[#38bdf8]"
+                      >
+                        <path
+                          d="M1 11L8 8.5L14 9.5L21 5.5L26 6.8L33 2"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      +{trendDelta}
+                    </span>
+                    <span className="text-[0.82rem] font-semibold text-primary">
                       {product.price.toLocaleString()}원
                     </span>
                   </div>
