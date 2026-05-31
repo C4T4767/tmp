@@ -1,11 +1,10 @@
 import { FavoritesScreen } from '@/components/screens/favorites-screen';
-import { BottomNav } from '@/components/bottom-nav';
+import { AppShell } from '@/components/app-shell';
 
 export default function FavoritesPage() {
   return (
-    <main className="mx-auto min-h-screen max-w-[411px] bg-background">
+    <AppShell>
       <FavoritesScreen />
-      <BottomNav />
-    </main>
+    </AppShell>
   );
 }

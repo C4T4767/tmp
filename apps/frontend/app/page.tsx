@@ -1,11 +1,10 @@
 import { HomeScreen } from '@/components/screens/home-screen';
-import { BottomNav } from '@/components/bottom-nav';
+import { AppShell } from '@/components/app-shell';
 
 export default function HomePage() {
   return (
-    <main className="mx-auto min-h-screen max-w-[411px] bg-background">
+    <AppShell>
       <HomeScreen />
-      <BottomNav />
-    </main>
+    </AppShell>
   );
 }

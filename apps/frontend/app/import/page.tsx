@@ -1,11 +1,10 @@
 import { ImportScreen } from '@/components/screens/import-screen';
-import { BottomNav } from '@/components/bottom-nav';
+import { AppShell } from '@/components/app-shell';
 
 export default function ImportPage() {
   return (
-    <main className="mx-auto min-h-screen max-w-[411px] bg-background">
+    <AppShell>
       <ImportScreen />
-      <BottomNav />
-    </main>
+    </AppShell>
   );
 }

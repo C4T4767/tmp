@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Heart, House, UserRoundCog, Users } from 'lucide-react';
+import { CircleUserRound, Heart, HousePlus, UsersRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/', label: '홈', icon: House },
+  { href: '/', label: '홈', icon: HousePlus },
   { href: '/favorites', label: '관심품목', icon: Heart },
-  { href: '/groups', label: '그룹', icon: Users },
-  { href: '/mypage', label: '마이', icon: UserRoundCog },
+  { href: '/groups', label: '그룹', icon: UsersRound },
+  { href: '/mypage', label: '마이', icon: CircleUserRound },
 ];
 
 export function BottomNav() {
@@ -26,10 +26,10 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex min-h-[3.85rem] flex-col items-center justify-center gap-1 text-[0.92rem] font-light leading-none transition-colors',
+                'flex min-h-[3.85rem] flex-col items-center justify-center gap-1 text-[0.92rem] leading-none transition-colors',
                 isActive
-                  ? 'text-primary'
-                  : 'text-primary/88 hover:text-primary'
+                  ? 'font-medium text-primary'
+                  : 'font-light text-primary/78 hover:text-primary'
               )}
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
@@ -38,9 +38,9 @@ export function BottomNav() {
               <item.icon
                 className={cn(
                   'h-7 w-7 transition-colors',
-                  isActive ? 'fill-current' : 'fill-transparent active:fill-current'
+                  isActive ? 'fill-secondary stroke-primary' : 'fill-transparent stroke-current'
                 )}
-                strokeWidth={1.95}
+                strokeWidth={isActive ? 2.05 : 1.8}
               />
               <span>{item.label}</span>
             </Link>

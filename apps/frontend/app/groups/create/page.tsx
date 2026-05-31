@@ -1,11 +1,10 @@
 import { GroupCreateScreen } from '@/components/screens/group-create-screen';
-import { BottomNav } from '@/components/bottom-nav';
+import { AppShell } from '@/components/app-shell';
 
 export default function GroupCreatePage() {
   return (
-    <main className="mx-auto min-h-screen max-w-[411px] bg-background">
+    <AppShell>
       <GroupCreateScreen />
-      <BottomNav />
-    </main>
+    </AppShell>
   );
 }
