@@ -1,9 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, UserPlus, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { ChevronRight, Plus, UserPlus, UsersRound } from 'lucide-react';
 import { mockGroups } from '@/lib/mock-data';
 import Link from 'next/link';
 
@@ -11,57 +9,72 @@ export function GroupsScreen() {
   const [groups] = useState(mockGroups);
 
   return (
-    <div className="flex flex-col gap-4 p-4 pb-24">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-foreground">내 그룹</h1>
-        <div className="flex gap-2">
-          <Button asChild size="sm" variant="outline">
-            <Link href="/groups/create">
-              <Plus className="mr-1 h-4 w-4" />
-              그룹 추가
-            </Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href="/groups/join">
-              <UserPlus className="mr-1 h-4 w-4" />
-              그룹 참가
-            </Link>
-          </Button>
-        </div>
+    <div className="flex flex-col gap-5 p-4 pb-24">
+      <header className="space-y-1">
+        <p className="text-[0.76rem] font-medium text-muted-foreground">함께 확인하는 안전 정보</p>
+        <h1 className="text-[1.58rem] font-semibold leading-tight text-primary">그룹</h1>
+      </header>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Link
+          href="/groups/create"
+          className="flex h-11 items-center justify-center gap-2 rounded-full border border-[#d9e3f2] bg-white text-[0.92rem] font-medium text-primary shadow-[0_8px_18px_rgba(10,37,64,0.08)] transition-transform active:scale-[0.98]"
+        >
+          <Plus className="h-4.5 w-4.5" strokeWidth={1.9} />
+          그룹 추가
+        </Link>
+        <Link
+          href="/groups/join"
+          className="flex h-11 items-center justify-center gap-2 rounded-full border border-[#d9e3f2] bg-white text-[0.92rem] font-medium text-primary shadow-[0_8px_18px_rgba(10,37,64,0.08)] transition-transform active:scale-[0.98]"
+        >
+          <UserPlus className="h-4.5 w-4.5" strokeWidth={1.9} />
+          그룹 참가
+        </Link>
       </div>
 
-      {/* Groups List */}
-      <div className="flex flex-col gap-3">
+      <section className="space-y-3">
         {groups.map((group) => (
-          <Card key={group.id} className="transition-shadow hover:shadow-md">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                    <Users className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">{group.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {group.memberCount}명 · 온보딩 {group.onboardedCount}명 완료
-                    </p>
-                  </div>
+          <Link
+            key={group.id}
+            href={`/groups/${group.id}`}
+            className="block rounded-[18px] border border-[#dce6f3] bg-white p-4 shadow-[0_8px_24px_rgba(10,37,64,0.07)] transition-transform active:scale-[0.99]"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-[#f2f7fd] text-primary">
+                  <UsersRound className="h-5.5 w-5.5" strokeWidth={1.8} />
                 </div>
-                <Button asChild size="sm" variant="secondary">
-                  <Link href={`/groups/${group.id}`}>그룹 보기</Link>
-                </Button>
+                <div className="min-w-0">
+                  <h2 className="truncate text-[1rem] font-semibold leading-tight text-primary">
+                    {group.name}
+                  </h2>
+                  <p className="mt-1 text-[0.78rem] font-medium text-muted-foreground">
+                    {group.memberCount}명 참여 중
+                  </p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+              <ChevronRight className="mt-3 h-5 w-5 shrink-0 text-primary/45" strokeWidth={1.8} />
+            </div>
+
+            <div className="mt-4 flex gap-2">
+              <span className="rounded-full bg-[#f4f7fb] px-2.5 py-1 text-[0.7rem] font-medium text-primary/72">
+                성분 주의 공유
+              </span>
+              <span className="rounded-full bg-[#e8f8ef] px-2.5 py-1 text-[0.7rem] font-medium text-[#12814d]">
+                안전 확인
+              </span>
+            </div>
+          </Link>
         ))}
-      </div>
+      </section>
 
       {groups.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Users className="mb-4 h-12 w-12 text-muted-foreground/50" />
-          <p className="text-muted-foreground">아직 참여중인 그룹이 없습니다.</p>
-          <p className="text-sm text-muted-foreground">
+        <div className="rounded-[18px] border border-[#dce6f3] bg-white p-8 text-center shadow-[0_8px_24px_rgba(10,37,64,0.06)]">
+          <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#f2f7fd]">
+            <UsersRound className="h-6 w-6 text-primary" />
+          </div>
+          <p className="mt-4 font-semibold text-primary">참여 중인 그룹이 없어요.</p>
+          <p className="mt-1 text-[0.82rem] text-muted-foreground">
             그룹을 만들거나 초대 코드로 참가해보세요.
           </p>
         </div>
