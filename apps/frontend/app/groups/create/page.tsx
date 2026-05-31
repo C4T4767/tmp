@@ -3,7 +3,7 @@ import { BottomNav } from '@/components/bottom-nav';
 
 export default function GroupCreatePage() {
   return (
-    <main className="mx-auto min-h-screen max-w-md bg-background">
+    <main className="mx-auto min-h-screen max-w-[411px] bg-background">
       <GroupCreateScreen />
       <BottomNav />
     </main>

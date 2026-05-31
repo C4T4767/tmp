@@ -9,7 +9,7 @@ export default async function GroupDetailPage({ params }: GroupDetailPageProps) 
   const { id } = await params;
   
   return (
-    <main className="mx-auto min-h-screen max-w-md bg-background">
+    <main className="mx-auto min-h-screen max-w-[411px] bg-background">
       <GroupDetailScreen groupId={id} />
       <BottomNav />
     </main>

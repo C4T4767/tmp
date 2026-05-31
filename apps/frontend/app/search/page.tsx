@@ -9,7 +9,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   
   return (
-    <main className="mx-auto min-h-screen max-w-md bg-background">
+    <main className="mx-auto min-h-screen max-w-[411px] bg-background">
       <SearchScreen initialQuery={params.q ?? ''} />
       <BottomNav />
     </main>

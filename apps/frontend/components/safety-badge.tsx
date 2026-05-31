@@ -9,7 +9,7 @@ interface SafetyBadgeProps {
 const statusConfig: Record<SafetyStatus, { label: string; className: string }> = {
   safe: {
     label: '안전',
-    className: 'bg-success text-success-foreground',
+    className: 'bg-[#E8F8EF] text-[#12814D]',
   },
   caution: {
     label: '주의',
